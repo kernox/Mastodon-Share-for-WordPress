@@ -1,1 +1,3 @@
-# Mastoshare-WP-
+# Mastoshare-WP
+
+Plugin pour Wordpress
