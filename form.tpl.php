@@ -40,6 +40,17 @@
             <textarea  rows="20" cols="80" name="message" id="message"><?php echo htmlentities(stripslashes($message)) ?></textarea>
         </div>
 
+        <div class="block">
+            <label for="mode">Toot mode</label>
+            <select name="mode" id="mode">
+                <option <?php if($mode == 'public'): ?>selected<?php endif; ?> value="public">Public</option>
+                <option <?php if($mode == 'unlisted'): ?>selected<?php endif; ?> value="unlisted">Unlisted</option>
+                <option <?php if($mode == 'private'): ?>selected<?php endif; ?> value="private">Private</option>
+                <option <?php if($mode == 'direct'): ?>selected<?php endif; ?> value="direct">Direct</option>
+            </select>
+        </div>
+
         <input class="button button-primary" type="submit" value="Save configuration" name="save" id="save">
+
     </form>
 </div>

@@ -32,13 +32,15 @@ function show_configuration_page() {
 
         $message = $_POST['message'];
         update_option('mastoshare-message', $message);
-
         update_option('mastoshare-token', $_POST['token']);
+        update_option('mastoshare-mode', $_POST['mode']);
+
     }
 
     $instance = get_option('mastoshare-instance');
     $token = get_option('mastoshare-token');
     $message = get_option('mastoshare-message', '[title] - [content] - [permalink]');
+    $mode = get_option('mastoshare-mode', 'public');
 
     if(isset($_POST['obtain_key'])) {
 
@@ -56,7 +58,6 @@ function show_configuration_page() {
         $authUrl =  $app->getAuthUrl();
         echo '<script>window.open("'.$authUrl.'")</script>';
     }
-
 
     include 'form.tpl.php';
 }
@@ -87,7 +88,9 @@ function toot_post($id){
         $token = get_option('mastoshare-token');
         $app->registerAccessToken(trim($token));
 
-        @$app->postStatus($message, 'public'); //Oui je sais l'@ c'est moche
+        $mode = get_option('mastoshare-mode', 'public');
+        
+        @$app->postStatus($message, $mode); //Oui je sais l'@ c'est moche
     }
 
 }
