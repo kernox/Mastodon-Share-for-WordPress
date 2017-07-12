@@ -1,0 +1,7 @@
+{
+    "id": 10449,
+    "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
+    "client_id": "c537c9cd9a801b05ff97dae6d2ffcce38d41279279caca5fc29a62888139fefe",
+    "client_secret": "a4ef11df6b7f90538e5700e7b80e9a9c2f7b723477a1da7c1f44159419ad2ca1",
+    "bearer": "720ab84815cc98a6fc2a6fbdaaf311f3276be86db7ea9ce0f379f0a81f914397"
+}
