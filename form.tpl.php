@@ -35,9 +35,12 @@
             <input type="text" name="token" id="token" value="<?php echo $token ?>" size="80">
         </div>
 
+
         <div class="block">
             <label for="message">Message</label>
-            <textarea  rows="20" cols="80" name="message" id="message"><?php echo htmlentities(stripslashes($message)) ?></textarea>
+            <textarea  rows="10" cols="80" name="message" id="message"><?php echo htmlentities(stripslashes($message)) ?></textarea>
+            <p><i>You can use these metas in the message</i> : [title], [excerpt], [permalink]</p>
+
         </div>
 
         <div class="block">
@@ -48,6 +51,11 @@
                 <option <?php if($mode == 'private'): ?>selected<?php endif; ?> value="private">Private</option>
                 <option <?php if($mode == 'direct'): ?>selected<?php endif; ?> value="direct">Direct</option>
             </select>
+        </div>
+
+        <div class="block">
+            <label for="size">Toot size</label>
+            <input name="size" id="size" type="number" min="100" max="500" value="<?php echo $tootSize ?>"> characters
         </div>
 
         <input class="button button-primary" type="submit" value="Save configuration" name="save" id="save">

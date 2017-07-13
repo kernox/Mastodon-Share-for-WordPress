@@ -3,16 +3,18 @@
 Plugin Name: Mastodon Share for WP
 Plugin URI: https://github.com/kernox
 Description: Share new wordpress posts on a mastodon instance.
-Version: 0.1
+Version: 0.2
 Author: Hellexis
 Author URI: https://github.com/kernox
 Text Domain: mastoshare
 */
 
 require_once 'tootophp/autoload.php';
-
+session_start();
 add_action( 'admin_menu', 'configuration_page');
 add_action('save_post', 'toot_post');
+add_action('admin_notices', 'admin_notices');
+
 
 function configuration_page() {
     add_menu_page(
@@ -34,13 +36,15 @@ function show_configuration_page() {
         update_option('mastoshare-message', $message);
         update_option('mastoshare-token', $_POST['token']);
         update_option('mastoshare-mode', $_POST['mode']);
+        update_option('mastoshare-toot-size', $_POST['size']);
 
     }
 
     $instance = get_option('mastoshare-instance');
     $token = get_option('mastoshare-token');
-    $message = get_option('mastoshare-message', '[title] - [content] - [permalink]');
+    $message = get_option('mastoshare-message', '[title] - [excerpt] - [permalink]');
     $mode = get_option('mastoshare-mode', 'public');
+    $tootSize = get_option('mastoshare-toot-size', 500);
 
     if(isset($_POST['obtain_key'])) {
 
@@ -64,33 +68,74 @@ function show_configuration_page() {
 
 
 function toot_post($id){
+
     $post = get_post($id);
+    $tootSize = (int)get_option('mastoshare-toot-size', 500);
 
     if($post->post_status === 'publish')
     {
+        $message = generate_toot($id, $tootSize, $tootSize);
 
-        $metas = array(
-            'title' => $post->post_title,
-            'content' => $post->post_content,
-            'permalink' => get_permalink($id)
-        );
+        if(!empty($message))
+        {
+            $instance = get_option('mastoshare-instance');
 
-        $message = get_option('mastoshare-message');
-        foreach($metas as $key => $value){
-            $message = str_replace('['.$key.']', $value, $message);
+            $tootoPHP = new TootoPHP\TootoPHP($instance);
+            $app = $tootoPHP->registerApp('Mastodon Share for WP', 'http://www.github.com/kernox');
+
+            $token = get_option('mastoshare-token');
+
+            $app->registerAccessToken(trim($token));
+
+            $mode = get_option('mastoshare-mode', 'public');
+            $toot = $app->postStatus($message, $mode);
+
+            if(isset($toot['error'])){
+                $_SESSION['mastoshare-notice'] = array('message' => 'Mastodon Share : Sorry, can\'t send toot !', 'class' => 'error');
+            } else {
+                $_SESSION['mastoshare-notice'] = array('message' => 'Mastodon Share : Toot successfully sent !', 'class' => 'success');
+            }
         }
+    }
+}
 
-        $instance = get_option('mastoshare-instance');
+function admin_notices() {
+    if(isset($_SESSION['mastoshare-notice'])) {
+        $notice = $_SESSION['mastoshare-notice'];
+        unset($_SESSION['mastoshare-notice']);
 
-        $tootoPHP = new TootoPHP\TootoPHP($instance);
-        $app = $tootoPHP->registerApp('Mastodon Share for WP', 'http://www.github.com/kernox');
+        echo '<div class="notice notice-'.$notice['class'].' is-dismissible"><p>'.$notice['message'].'</p></div>';
+    }
+}
 
-        $token = get_option('mastoshare-token');
-        $app->registerAccessToken(trim($token));
+function generate_toot($post_id, $excerpt_limit, $goal_limit) {
 
-        $mode = get_option('mastoshare-mode', 'public');
-        
-        @$app->postStatus($message, $mode); //Oui je sais l'@ c'est moche
+    $post = get_post($post_id);
+
+    $metas = array(
+        'title' => $post->post_title,
+        'excerpt' => (empty($post->post_excerpt)) ? $post->post_content : $post->post_excerpt,
+        'permalink' => get_permalink($post_id)
+    );
+
+    $metas['excerpt'] = substr(
+        $metas['excerpt'],
+        0,
+        $excerpt_limit
+    ).'...';
+
+    $message = get_option('mastoshare-message');
+    foreach($metas as $key => $value){
+        $message = str_replace('['.$key.']', $value, $message);
     }
 
+    if(strlen($message) > $goal_limit) {
+        //Not good size retry to generate the too
+        return generate_toot($post_id, $excerpt_limit - 5, $goal_limit);
+    }
+    else
+    {
+        //Good size return the generated toot
+        return $message;
+    }
 }
