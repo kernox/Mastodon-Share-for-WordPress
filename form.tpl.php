@@ -32,7 +32,7 @@
 
         <div class="block">
             <label for="token">Access Key</label>
-            <input type="text" name="token" id="token" value="<?php echo $token ?>" size="80">
+            <input type="text" name="token" id="token" value="<?php echo $token ?>" size="80" required>
         </div>
 
 

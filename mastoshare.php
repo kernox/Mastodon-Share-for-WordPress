@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Mastodon Share for WP
-Plugin URI: https://github.com/kernox
+Plugin URI: https://github.com/kernox/mastoshare-wp
 Description: Share new wordpress posts on a mastodon instance.
 Version: 0.2
 Author: Hellexis
@@ -10,25 +10,25 @@ Text Domain: mastoshare
 */
 
 require_once 'tootophp/autoload.php';
-session_start();
-add_action( 'admin_menu', 'configuration_page');
-add_action('save_post', 'toot_post');
-add_action('admin_notices', 'admin_notices');
+
+add_action( 'admin_menu', 'mastoshare_configuration_page');
+add_action('save_post', 'mastoshare_toot_post');
+add_action('admin_notices', 'mastoshare_admin_notices');
 
 
-function configuration_page() {
+function mastoshare_configuration_page() {
     add_menu_page(
         'Mastodon Share',
         'Mastodon Share',
         'install_plugins',
         'mastoshare',
-        'show_configuration_page',
+        'mastoshare_show_configuration_page',
         'dashicons-share',
         1000
-        );
+    );
 }
 
-function show_configuration_page() {
+function mastoshare_show_configuration_page() {
 
     if(isset($_POST['save'])) {
 
@@ -67,14 +67,14 @@ function show_configuration_page() {
 }
 
 
-function toot_post($id){
+function mastoshare_toot_post($id){
 
     $post = get_post($id);
     $tootSize = (int)get_option('mastoshare-toot-size', 500);
 
     if($post->post_status === 'publish')
     {
-        $message = generate_toot($id, $tootSize, $tootSize);
+        $message = mastoshare_generate_toot($id, $tootSize, $tootSize);
 
         if(!empty($message))
         {
@@ -88,27 +88,45 @@ function toot_post($id){
             $app->registerAccessToken(trim($token));
 
             $mode = get_option('mastoshare-mode', 'public');
+
             $toot = $app->postStatus($message, $mode);
 
             if(isset($toot['error'])){
-                $_SESSION['mastoshare-notice'] = array('message' => 'Mastodon Share : Sorry, can\'t send toot !', 'class' => 'error');
+                update_option(
+                    'mastoshare-notice',
+                    serialize(
+                        array(
+                            'message' => 'Mastodon Share : Sorry, can\'t send toot !<p><strong>Instance message</strong> : '.$toot['error'].'</p>',
+                            'class' => 'error'
+                        )
+                    )
+                );
             } else {
-                $_SESSION['mastoshare-notice'] = array('message' => 'Mastodon Share : Toot successfully sent !', 'class' => 'success');
+                update_option(
+                    'mastoshare-notice',
+                    serialize(
+                        array(
+                            'message' => 'Mastodon Share : Toot successfully sent !',
+                            'class' => 'success'
+                        )
+                    )
+                );
             }
         }
     }
 }
 
-function admin_notices() {
-    if(isset($_SESSION['mastoshare-notice'])) {
-        $notice = $_SESSION['mastoshare-notice'];
-        unset($_SESSION['mastoshare-notice']);
+function mastoshare_admin_notices() {
 
+    $notice = unserialize(get_option('mastoshare-notice'));
+
+    if(is_array($notice)){
         echo '<div class="notice notice-'.$notice['class'].' is-dismissible"><p>'.$notice['message'].'</p></div>';
+        update_option('mastoshare-notice', null);
     }
 }
 
-function generate_toot($post_id, $excerpt_limit, $goal_limit) {
+function mastoshare_generate_toot($post_id, $excerpt_limit, $goal_limit) {
 
     $post = get_post($post_id);
 
@@ -131,7 +149,7 @@ function generate_toot($post_id, $excerpt_limit, $goal_limit) {
 
     if(strlen($message) > $goal_limit) {
         //Not good size retry to generate the too
-        return generate_toot($post_id, $excerpt_limit - 5, $goal_limit);
+        return mastoshare_generate_toot($post_id, $excerpt_limit - 5, $goal_limit);
     }
     else
     {
