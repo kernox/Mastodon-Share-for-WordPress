@@ -15,7 +15,6 @@ add_action( 'admin_menu', 'mastoshare_configuration_page');
 add_action('save_post', 'mastoshare_toot_post');
 add_action('admin_notices', 'mastoshare_admin_notices');
 
-
 function mastoshare_configuration_page() {
     add_menu_page(
         'Mastodon Share',
