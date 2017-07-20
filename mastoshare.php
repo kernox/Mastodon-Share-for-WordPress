@@ -3,7 +3,7 @@
 Plugin Name: Mastodon Share for WP
 Plugin URI: https://github.com/kernox/mastoshare-wp
 Description: Share new wordpress posts on a mastodon instance.
-Version: 0.2
+Version: 0.3
 Author: Hellexis
 Author URI: https://github.com/kernox
 Text Domain: mastoshare
