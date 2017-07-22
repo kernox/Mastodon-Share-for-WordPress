@@ -14,6 +14,7 @@ require_once 'tootophp/autoload.php';
 add_action( 'admin_menu', 'mastoshare_configuration_page');
 add_action('save_post', 'mastoshare_toot_post');
 add_action('admin_notices', 'mastoshare_admin_notices');
+add_action('post_submitbox_misc_actions', 'add_publish_meta_options');
 
 function mastoshare_configuration_page() {
     add_menu_page(
@@ -65,15 +66,29 @@ function mastoshare_show_configuration_page() {
     include 'form.tpl.php';
 }
 
+function add_publish_meta_options($post) {
+
+    $status = get_post_meta($post->ID, 'mastoshare-post-status', true);
+
+    $checked = (!$status) ? 'checked' : '';
+
+    echo '<div class="misc-pub-section misc-pub-section-last">'.
+    '<input '.$checked.' type="checkbox" name="toot_on_mastodon" id="toot_on_mastodon"><label for="toot_on_mastodon">Toot on Mastodon</label>'.
+    '</div>';
+}
+
 
 function mastoshare_toot_post($id){
 
     $post = get_post($id);
     $tootSize = (int)get_option('mastoshare-toot-size', 500);
 
-    if($post->post_status === 'publish')
+    $tootOnMastodonOption = ($_POST['toot_on_mastodon'] == 'on');
+
+    if($tootOnMastodonOption && $post->post_status === 'publish')
     {
         $message = mastoshare_generate_toot($id, $tootSize, $tootSize);
+        $message = strip_tags($message);
 
         if(!empty($message))
         {
@@ -87,8 +102,9 @@ function mastoshare_toot_post($id){
             $app->registerAccessToken(trim($token));
 
             $mode = get_option('mastoshare-mode', 'public');
-
             $toot = $app->postStatus($message, $mode);
+
+            update_post_meta($post->ID, 'mastoshare-post-status', 'off');
 
             if(isset($toot['error'])){
                 update_option(
