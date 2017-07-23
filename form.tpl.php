@@ -15,6 +15,10 @@
     h1.big-title{
         margin-bottom: 20px;
     }
+
+    .spacer{
+        margin: 20px 0;
+    }
 </style>
 
 <div class="wrap">
@@ -68,4 +72,9 @@
         <input class="button button-primary" type="submit" value="<?php _e('Save configuration', 'mastoshare') ?>" name="save" id="save">
 
     </form>
+
+    <hr class="spacer">
+    <script src="https://liberapay.com/hellexis/widgets/button.js"></script>
+    <noscript><a href="https://liberapay.com/hellexis/donate"><img src="https://liberapay.com/assets/widgets/donate.svg"></a></noscript>
+
 </div>
