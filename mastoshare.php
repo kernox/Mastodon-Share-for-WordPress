@@ -3,7 +3,7 @@
 Plugin Name: Mastodon Share for WP
 Plugin URI: https://github.com/kernox/mastoshare-wp
 Description: Share new wordpress posts on a mastodon instance.
-Version: 0.3
+Version: 0.4
 Author: Hellexis
 Author URI: https://github.com/kernox
 Text Domain: mastoshare
@@ -14,7 +14,7 @@ require_once 'tootophp/autoload.php';
 add_action( 'admin_menu', 'mastoshare_configuration_page');
 add_action('save_post', 'mastoshare_toot_post');
 add_action('admin_notices', 'mastoshare_admin_notices');
-add_action('post_submitbox_misc_actions', 'add_publish_meta_options');
+add_action('post_submitbox_misc_actions', 'mastoshare_add_publish_meta_options');
 add_action('plugins_loaded', 'mastoshare_init');
 
 
@@ -41,7 +41,7 @@ function mastoshare_show_configuration_page() {
 
         $isValidNonce = wp_verify_nonce($_POST['_wpnonce'], 'mastoshare-configuration');
 
-        if($isValidNonce){
+        if($isValidNonce) {
             $message = $_POST['message'];
             update_option('mastoshare-message', sanitize_textarea_field($message));
             update_option('mastoshare-token', sanitize_key($_POST['token']));
@@ -60,8 +60,10 @@ function mastoshare_show_configuration_page() {
 
         $isValidNonce = wp_verify_nonce($_POST['_wpnonce'], 'instance-access-key');
 
-        if($isValidNonce){
-            $instance = $_POST['instance'];
+        if($isValidNonce) {
+            $instance = esc_url($_POST['instance']);
+            $instance = parse_url($instance)['host'];
+
             update_option('mastoshare-instance', $instance);
 
             $tootoPHP = new TootoPHP\TootoPHP($instance);
@@ -75,13 +77,12 @@ function mastoshare_show_configuration_page() {
             $authUrl =  $app->getAuthUrl();
             echo '<script>window.open("'.$authUrl.'")</script>';
         }
-
     }
 
     include 'form.tpl.php';
 }
 
-function add_publish_meta_options($post) {
+function mastoshare_add_publish_meta_options($post) {
 
     $status = get_post_meta($post->ID, 'mastoshare-post-status', true);
 
@@ -94,20 +95,18 @@ function add_publish_meta_options($post) {
 }
 
 
-function mastoshare_toot_post($id){
+function mastoshare_toot_post($id) {
 
     $post = get_post($id);
     $tootSize = (int)get_option('mastoshare-toot-size', 500);
 
     $tootOnMastodonOption = ($_POST['toot_on_mastodon'] == 'on');
 
-    if($tootOnMastodonOption && $post->post_status === 'publish')
-    {
+    if($tootOnMastodonOption && $post->post_status === 'publish') {
         $message = mastoshare_generate_toot($id, $tootSize, $tootSize);
         $message = strip_tags($message);
 
-        if(!empty($message))
-        {
+        if(!empty($message)) {
             $instance = get_option('mastoshare-instance');
 
             $tootoPHP = new TootoPHP\TootoPHP($instance);
@@ -122,7 +121,7 @@ function mastoshare_toot_post($id){
 
             update_post_meta($post->ID, 'mastoshare-post-status', 'off');
 
-            if(isset($toot['error'])){
+            if(isset($toot['error'])) {
                 update_option(
                     'mastoshare-notice',
                     serialize(
@@ -130,9 +129,9 @@ function mastoshare_toot_post($id){
                             'message' => 'Mastodon Share: '.__('Sorry, can\'t send toot !', 'mastoshare').
                             '<p><strong>'. __('Instance message', 'mastoshare').'</strong> : '.$toot['error'].'</p>',
                             'class' => 'error'
-                            )
                         )
-                    );
+                    )
+                );
             } else {
                 update_option(
                     'mastoshare-notice',
@@ -140,9 +139,9 @@ function mastoshare_toot_post($id){
                         array(
                             'message' => 'Mastodon Share: '. __('Toot successfully sent !', 'mastoshare'),
                             'class' => 'success'
-                            )
                         )
-                    );
+                    )
+                );
             }
         }
     }
@@ -166,13 +165,13 @@ function mastoshare_generate_toot($post_id, $excerpt_limit, $goal_limit) {
         'title' => $post->post_title,
         'excerpt' => (empty($post->post_excerpt)) ? $post->post_content : $post->post_excerpt,
         'permalink' => get_permalink($post_id)
-        );
+    );
 
     $metas['excerpt'] = substr(
         $metas['excerpt'],
         0,
         $excerpt_limit
-        ).'...';
+    ).'...';
 
     $message = get_option('mastoshare-message');
     foreach($metas as $key => $value){
@@ -180,7 +179,7 @@ function mastoshare_generate_toot($post_id, $excerpt_limit, $goal_limit) {
     }
 
     if(strlen($message) > $goal_limit) {
-        //Not good size retry to generate the too
+        //Not good size retry to generate the toot
         return mastoshare_generate_toot($post_id, $excerpt_limit - 5, $goal_limit);
     }
     else
