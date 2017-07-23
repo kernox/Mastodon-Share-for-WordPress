@@ -39,12 +39,15 @@ function mastoshare_show_configuration_page() {
 
     if(isset($_POST['save'])) {
 
-        $message = $_POST['message'];
-        update_option('mastoshare-message', $message);
-        update_option('mastoshare-token', $_POST['token']);
-        update_option('mastoshare-mode', $_POST['mode']);
-        update_option('mastoshare-toot-size', $_POST['size']);
+        $isValidNonce = wp_verify_nonce($_POST['_wpnonce'], 'mastoshare-configuration');
 
+        if($isValidNonce){
+            $message = $_POST['message'];
+            update_option('mastoshare-message', sanitize_textarea_field($message));
+            update_option('mastoshare-token', sanitize_key($_POST['token']));
+            update_option('mastoshare-mode', sanitize_text_field($_POST['mode']));
+            update_option('mastoshare-toot-size', (int)$_POST['size']);
+        }
     }
 
     $instance = get_option('mastoshare-instance');
@@ -55,19 +58,24 @@ function mastoshare_show_configuration_page() {
 
     if(isset($_POST['obtain_key'])) {
 
-        $instance = $_POST['instance'];
-        update_option('mastoshare-instance', $instance);
+        $isValidNonce = wp_verify_nonce($_POST['_wpnonce'], 'instance-access-key');
 
-        $tootoPHP = new TootoPHP\TootoPHP($instance);
+        if($isValidNonce){
+            $instance = $_POST['instance'];
+            update_option('mastoshare-instance', $instance);
 
-        // Setting up your App name and your website
-        $app = $tootoPHP->registerApp('Mastodon Share for WP', 'http://www.github.com/kernox');
-        if ( $app === false) {
-            throw new Exception('Problem during register app');
+            $tootoPHP = new TootoPHP\TootoPHP($instance);
+
+            // Setting up your App name and your website
+            $app = $tootoPHP->registerApp('Mastodon Share for WP', 'http://www.github.com/kernox');
+            if ( $app === false) {
+                throw new Exception('Problem during register app');
+            }
+
+            $authUrl =  $app->getAuthUrl();
+            echo '<script>window.open("'.$authUrl.'")</script>';
         }
 
-        $authUrl =  $app->getAuthUrl();
-        echo '<script>window.open("'.$authUrl.'")</script>';
     }
 
     include 'form.tpl.php';

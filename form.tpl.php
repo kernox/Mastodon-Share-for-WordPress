@@ -20,6 +20,7 @@
 <div class="wrap">
     <h1 class="big-title"><?php _e('Mastodon Share Configuration', 'mastoshare') ?></h1>
     <form method="POST">
+        <?php wp_nonce_field( 'instance-access-key'); ?>
         <div class="block">
             <label for="instance"><?php _e('Instance', 'mastoshare') ?></label>
             <input type="text" id="instance" name="instance" size="80" value="<?php echo $instance ?>">
@@ -33,8 +34,9 @@
             </p>
         </div>
     </form>
-    <form method="POST">
 
+    <form method="POST">
+        <?php wp_nonce_field( 'mastoshare-configuration'); ?>
         <div class="block">
             <label for="token"><?php _e('Access Key', 'mastoshare') ?></label>
             <input type="text" name="token" id="token" value="<?php echo $token ?>" size="80" required>
