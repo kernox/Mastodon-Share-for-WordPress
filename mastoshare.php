@@ -15,6 +15,13 @@ add_action( 'admin_menu', 'mastoshare_configuration_page');
 add_action('save_post', 'mastoshare_toot_post');
 add_action('admin_notices', 'mastoshare_admin_notices');
 add_action('post_submitbox_misc_actions', 'add_publish_meta_options');
+add_action('plugins_loaded', 'mastoshare_init');
+
+
+function mastoshare_init() {
+   $plugin_dir = basename(dirname(__FILE__));
+   load_plugin_textdomain('mastoshare', false, $plugin_dir.'/languages' );
+}
 
 function mastoshare_configuration_page() {
     add_menu_page(
@@ -73,7 +80,8 @@ function add_publish_meta_options($post) {
     $checked = (!$status) ? 'checked' : '';
 
     echo '<div class="misc-pub-section misc-pub-section-last">'.
-    '<input '.$checked.' type="checkbox" name="toot_on_mastodon" id="toot_on_mastodon"><label for="toot_on_mastodon">Toot on Mastodon</label>'.
+    '<input '.$checked.' type="checkbox" name="toot_on_mastodon" id="toot_on_mastodon">'.
+    '<label for="toot_on_mastodon">'. __('Toot on Mastodon', 'mastoshare') .'</label>'.
     '</div>';
 }
 
@@ -111,21 +119,22 @@ function mastoshare_toot_post($id){
                     'mastoshare-notice',
                     serialize(
                         array(
-                            'message' => 'Mastodon Share : Sorry, can\'t send toot !<p><strong>Instance message</strong> : '.$toot['error'].'</p>',
+                            'message' => 'Mastodon Share: '.__('Sorry, can\'t send toot !', 'mastoshare').
+                            '<p><strong>'. __('Instance message', 'mastoshare').'</strong> : '.$toot['error'].'</p>',
                             'class' => 'error'
+                            )
                         )
-                    )
-                );
+                    );
             } else {
                 update_option(
                     'mastoshare-notice',
                     serialize(
                         array(
-                            'message' => 'Mastodon Share : Toot successfully sent !',
+                            'message' => 'Mastodon Share: '. __('Toot successfully sent !', 'mastoshare'),
                             'class' => 'success'
+                            )
                         )
-                    )
-                );
+                    );
             }
         }
     }
@@ -149,13 +158,13 @@ function mastoshare_generate_toot($post_id, $excerpt_limit, $goal_limit) {
         'title' => $post->post_title,
         'excerpt' => (empty($post->post_excerpt)) ? $post->post_content : $post->post_excerpt,
         'permalink' => get_permalink($post_id)
-    );
+        );
 
     $metas['excerpt'] = substr(
         $metas['excerpt'],
         0,
         $excerpt_limit
-    ).'...';
+        ).'...';
 
     $message = get_option('mastoshare-message');
     foreach($metas as $key => $value){
