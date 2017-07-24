@@ -1,80 +1,79 @@
 <style>
-    label{
-        display: block;
-        font-weight: bold;
-    }
+	label{
+		display: block;
+		font-weight: bold;
+	}
 
-    .block{
-        margin-bottom: 20px;
-    }
+	.block{
+		margin-bottom: 20px;
+	}
 
-    #instance, #message, #token{
-        width: 500px;
-    }
+	#instance, #message, #token{
+		width: 500px;
+	}
 
-    h1.big-title{
-        margin-bottom: 20px;
-    }
+	h1.big-title{
+		margin-bottom: 20px;
+	}
 
-    .spacer{
-        margin: 20px 0;
-    }
+	.spacer{
+		margin: 20px 0;
+	}
 </style>
 
 <div class="wrap">
-    <h1 class="big-title"><?php _e('Mastodon Share Configuration', 'mastoshare') ?></h1>
-    <form method="POST">
-        <?php wp_nonce_field( 'instance-access-key'); ?>
-        <div class="block">
-            <label for="instance"><?php _e('Instance', 'mastoshare') ?></label>
-            <input type="text" id="instance" name="instance" size="80" value="<?php echo $instance ?>">
-            <p>
-                <input
-                    class="button button-secondary"
-                    type="submit" name="obtain_key"
-                    id="obtain_key"
-                    value="<?php _e('Obtain Access Key', 'mastoshare') ?>"
-                >
-            </p>
-        </div>
-    </form>
+	<h1 class="big-title"><?php esc_html_e( 'Mastodon Share Configuration', 'mastoshare' ); ?></h1>
+	<form method="POST">
+		<?php wp_nonce_field( 'instance-access-key' ); ?>
+		<div class="block">
+			<label for="instance"><?php esc_html_e( 'Instance', 'mastoshare' ); ?></label>
+			<input type="text" id="instance" name="instance" size="80" value="<?php esc_attr_e( $instance ); ?>">
+			<p>
+				<input
+					class="button button-secondary"
+					type="submit" name="obtain_key"
+					id="obtain_key"
+					value="<?php esc_attr_e( 'Obtain Access Key', 'mastoshare' ); ?>"
+				>
+			</p>
+		</div>
+	</form>
 
-    <form method="POST">
-        <?php wp_nonce_field( 'mastoshare-configuration'); ?>
-        <div class="block">
-            <label for="token"><?php _e('Access Key', 'mastoshare') ?></label>
-            <input type="text" name="token" id="token" value="<?php echo $token ?>" size="80" required>
-        </div>
+	<form method="POST">
+		<?php wp_nonce_field( 'mastoshare-configuration' ); ?>
+		<div class="block">
+			<label for="token"><?php esc_html_e( 'Access Key', 'mastoshare' ); ?></label>
+			<input type="text" name="token" id="token" value="<?php esc_attr_e( $token ); ?>" size="80" required>
+		</div>
 
 
-        <div class="block">
-            <label for="message"><?php _e('Message', 'mastoshare') ?></label>
-            <textarea  rows="10" cols="80" name="message" id="message"><?php echo htmlentities(stripslashes($message)) ?></textarea>
-            <p><i><?php _e('You can use these metas in the message', 'mastoshare') ?></i> : [title], [excerpt], [permalink]</p>
+		<div class="block">
+			<label for="message"><?php esc_html_e( 'Message', 'mastoshare' ); ?></label>
+			<textarea  rows="10" cols="80" name="message" id="message"><?php esc_html_e( stripslashes( $message ) ); ?></textarea>
+			<p><i><?php esc_html_e( 'You can use these metas in the message', 'mastoshare' ); ?></i> : [title], [excerpt], [permalink]</p>
+		</div>
 
-        </div>
+		<div class="block">
+			<label for="mode"><?php esc_html_e( 'Toot mode', 'mastoshare' ); ?></label>
+			<select name="mode" id="mode">
+				<option <?php if ( 'public' === $mode ): ?>selected<?php endif; ?> value="public"><?php esc_html_e( 'Public', 'mastoshare' ); ?></option>
+				<option <?php if ( 'unlisted' === $mode ): ?>selected<?php endif; ?> value="unlisted"><?php esc_html_e( 'Unlisted', 'mastoshare' ); ?></option>
+				<option <?php if ( 'private' === $mode ): ?>selected<?php endif; ?> value="private"><?php esc_html_e( 'Private', 'mastoshare' ); ?></option>
+				<option <?php if ( 'direct' === $mode ): ?>selected<?php endif; ?> value="direct"><?php esc_html_e( 'Direct', 'mastoshare' ); ?></option>
+			</select>
+		</div>
 
-        <div class="block">
-            <label for="mode"><?php _e('Toot mode', 'mastoshare') ?></label>
-            <select name="mode" id="mode">
-                <option <?php if($mode == 'public'): ?>selected<?php endif; ?> value="public"><?php _e('Public', 'mastoshare') ?></option>
-                <option <?php if($mode == 'unlisted'): ?>selected<?php endif; ?> value="unlisted"><?php _e('Unlisted', 'mastoshare') ?></option>
-                <option <?php if($mode == 'private'): ?>selected<?php endif; ?> value="private"><?php _e('Private', 'mastoshare') ?></option>
-                <option <?php if($mode == 'direct'): ?>selected<?php endif; ?> value="direct"><?php _e('Direct', 'mastoshare') ?></option>
-            </select>
-        </div>
+		<div class="block">
+			<label for="size"><?php esc_html_e( 'Toot size', 'mastoshare' ); ?></label>
+			<input name="size" id="size" type="number" min="100" max="500" value="<?php esc_attr_e( $toot_size ); ?>"> <?php esc_html_e( 'characters', 'mastoshare' ); ?>
+		</div>
 
-        <div class="block">
-            <label for="size"><?php _e('Toot size', 'mastoshare') ?></label>
-            <input name="size" id="size" type="number" min="100" max="500" value="<?php echo $tootSize ?>"> <?php _e('characters', 'mastoshare') ?>
-        </div>
+		<input class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save configuration', 'mastoshare' ); ?>" name="save" id="save">
 
-        <input class="button button-primary" type="submit" value="<?php _e('Save configuration', 'mastoshare') ?>" name="save" id="save">
+	</form>
 
-    </form>
-
-    <hr class="spacer">
-    <script src="https://liberapay.com/hellexis/widgets/button.js"></script>
-    <noscript><a href="https://liberapay.com/hellexis/donate"><img src="https://liberapay.com/assets/widgets/donate.svg"></a></noscript>
+	<hr class="spacer">
+	<script src="https://liberapay.com/hellexis/widgets/button.js"></script>
+	<noscript><a href="https://liberapay.com/hellexis/donate"><img src="https://liberapay.com/assets/widgets/donate.svg"></a></noscript>
 
 </div>
