@@ -3,8 +3,8 @@
 /*
 Plugin Name: Mastodon Share for WP
 Plugin URI: https://github.com/kernox/mastoshare-wp
-Description: Share new WordPress posts on a mastodon instance.
-Version: 0.4
+Description: Share WordPress posts on a mastodon instance.
+Version: 0.6
 Author: Hellexis
 Author URI: https://github.com/kernox
 Text Domain: mastoshare
@@ -20,6 +20,7 @@ add_action( 'plugins_loaded', 'mastoshare_init' );
 
 /**
  * Mastoshare_init
+ *
  * Plugin initialization
  *
  * @return void
@@ -32,22 +33,24 @@ function mastoshare_init() {
 /**
  * Mastoshare_configuration_page
  *
+ * Add the configuration page menu
+ *
  * @return void
  */
 function mastoshare_configuration_page() {
-	add_menu_page(
+	add_options_page(
 		'Mastodon Share',
 		'Mastodon Share',
 		'install_plugins',
 		'mastoshare',
-		'mastoshare_show_configuration_page',
-		'dashicons-share',
-		1000
+		'mastoshare_show_configuration_page'
 	);
 }
 
 /**
  * Mastoshare_show_configuration_page
+ *
+ * Content of the configuration page
  *
  * @throws Exception The exception.
  * @return void
