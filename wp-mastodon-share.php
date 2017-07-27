@@ -169,12 +169,11 @@ function mastoshare_toot_post( $id ) {
 				$thumb_path = str_replace(get_site_url(), get_home_path(), $thumb_url);
 
 				$attachment = $app->createAttachement( $thumb_path );
-				var_dump($attachment); 
 
-				$medias = [$attachment['id']];
+				$media = $attachment['id'];
 			}
-			//TODO ici ça foire, sur medias
-			$toot = $app->postStatus( $message, $mode, $medias);
+			
+			$toot = $app->postStatus( $message, $mode, $media);
 
 			update_post_meta( $post->ID, 'mastoshare-post-status', 'off' );
 

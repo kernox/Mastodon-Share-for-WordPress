@@ -286,7 +286,7 @@ class TootoPHP
             [
                 'status' => $content,
                 'visibility' => $visibility,
-                'media_ids' => $medias
+                'media_ids[]' => $medias
             ]
         );
     }
