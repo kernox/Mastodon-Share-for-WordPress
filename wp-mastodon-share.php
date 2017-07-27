@@ -1,14 +1,15 @@
 <?php
 
-/*
-Plugin Name: Mastodon Share for WP
-Plugin URI: https://github.com/kernox/mastoshare-wp
-Description: Share WordPress posts on a mastodon instance.
-Version: 0.6
-Author: Hellexis
-Author URI: https://github.com/kernox
-Text Domain: mastoshare
-*/
+/**
+ * Plugin Name: Mastodon Share
+ * Plugin URI: https://github.com/kernox/mastoshare-wp
+ * Description: Share WordPress posts on a mastodon instance.
+ * Version: 0.7
+ * Author: Hellexis
+ * Author URI: https://github.com/kernox
+ * Text Domain: wp-mastodon-share
+ * Domain Path: /languages
+ */
 
 require_once 'tootophp/autoload.php';
 
@@ -27,7 +28,7 @@ add_action( 'plugins_loaded', 'mastoshare_init' );
  */
 function mastoshare_init() {
 	$plugin_dir = basename( dirname( __FILE__ ) );
-	load_plugin_textdomain( 'mastoshare', false, $plugin_dir . '/languages' );
+	load_plugin_textdomain( 'wp-mastodon-share', false, $plugin_dir . '/languages' );
 }
 
 /**
@@ -42,7 +43,7 @@ function mastoshare_configuration_page() {
 		'Mastodon Share',
 		'Mastodon Share',
 		'install_plugins',
-		'mastoshare',
+		'wp-mastodon-share',
 		'mastoshare_show_configuration_page'
 	);
 }
@@ -61,10 +62,23 @@ function mastoshare_show_configuration_page() {
 
 		$is_valid_nonce = wp_verify_nonce( $_POST['_wpnonce'], 'mastoshare-configuration' );
 
-		if ( $is_valid_nonce ) {
+		if ( $is_valid_nonce ) {			
+			$instance = get_option( 'mastoshare-instance' );
 			$message = $_POST['message'];
+			$token = sanitize_key( $_POST['token'] );
+
+			$tooto_php = new TootoPHP\TootoPHP( $instance );
+			$app = $tooto_php->registerApp( 'Mastodon Share for WP', 'http://www.github.com/kernox' );
+			
+			if($token != get_option('mastoshare-token')){
+				$app->registerAccessToken( trim( $token ) );
+
+				//Force the token fetch
+				$profile = $app->getUser();
+			}
+
 			update_option( 'mastoshare-message', sanitize_textarea_field( $message ) );
-			update_option( 'mastoshare-token', sanitize_key( $_POST['token'] ) );
+			update_option( 'mastoshare-token', $token );
 			update_option( 'mastoshare-mode', sanitize_text_field( $_POST['mode'] ) );
 			update_option( 'mastoshare-toot-size', (int) $_POST['size'] );
 		}
@@ -116,7 +130,7 @@ function mastoshare_add_publish_meta_options( $post ) {
 
 	echo '<div class="misc-pub-section misc-pub-section-last">' .
 	'<input ' . $checked . ' type="checkbox" name="toot_on_mastodon" id="toot_on_mastodon">' .
-	'<label for="toot_on_mastodon">' . __( 'Toot on Mastodon', 'mastoshare' ) . '</label>' .
+	'<label for="toot_on_mastodon">' . __( 'Toot on Mastodon', 'wp-mastodon-share' ) . '</label>' .
 	'</div>';
 }
 
@@ -130,6 +144,8 @@ function mastoshare_add_publish_meta_options( $post ) {
 function mastoshare_toot_post( $id ) {
 
 	$post = get_post( $id );
+	$thumb_url = get_the_post_thumbnail_url($id);
+	
 	$toot_size = (int) get_option( 'mastoshare-toot-size', 500 );
 
 	$toot_on_mastodon_option = ( 'on'  === $_POST['toot_on_mastodon'] );
@@ -144,12 +160,21 @@ function mastoshare_toot_post( $id ) {
 			$tooto_php = new TootoPHP\TootoPHP( $instance );
 			$app = $tooto_php->registerApp( 'Mastodon Share for WP', 'http://www.github.com/kernox' );
 
-			$token = get_option( 'mastoshare-token' );
-
-			$app->registerAccessToken( trim( $token ) );
-
 			$mode = get_option( 'mastoshare-mode', 'public' );
-			$toot = $app->postStatus( $message, $mode );
+
+			$medias = array();
+
+			if ( $thumb_url ) {
+
+				$thumb_path = str_replace(get_site_url(), get_home_path(), $thumb_url);
+
+				$attachment = $app->createAttachement( $thumb_path );
+				var_dump($attachment); 
+
+				$medias = [$attachment['id']];
+			}
+			//TODO ici ça foire, sur medias
+			$toot = $app->postStatus( $message, $mode, $medias);
 
 			update_post_meta( $post->ID, 'mastoshare-post-status', 'off' );
 
@@ -158,8 +183,8 @@ function mastoshare_toot_post( $id ) {
 					'mastoshare-notice',
 					serialize(
 						array(
-							'message' => 'Mastodon Share: ' . __( 'Sorry, can\'t send toot !', 'mastoshare' ) .
-							'<p><strong>' . __( 'Instance message', 'mastoshare' ) . '</strong> : ' . $toot['error'] . '</p>',
+							'message' => '<strong>Mastodon Share</strong> : ' . __( 'Sorry, can\'t send toot !', 'wp-mastodon-share' ) .
+							'<p><strong>' . __( 'Instance message', 'wp-mastodon-share' ) . '</strong> : ' . $toot['error'] . '</p>',
 							'class' => 'error',
 						)
 					)
@@ -169,7 +194,7 @@ function mastoshare_toot_post( $id ) {
 					'mastoshare-notice',
 					serialize(
 						array(
-							'message' => 'Mastodon Share: ' . __( 'Toot successfully sent !', 'mastoshare' ),
+							'message' => '<strong>Mastodon Share</strong> : ' . __( 'Toot successfully sent !', 'wp-mastodon-share' ),
 							'class' => 'success',
 						)
 					)
@@ -190,7 +215,7 @@ function mastoshare_admin_notices() {
 	$notice = unserialize( get_option( 'mastoshare-notice' ) );
 
 	if ( is_array( $notice ) ) {
-		echo '<div class="notice notice-' . sanitize_html_class( $notice['class'] ) . ' is-dismissible"><p>' . esc_html( $notice['message'] ) . '</p></div>';
+		echo '<div class="notice notice-' . sanitize_html_class( $notice['class'] ) . ' is-dismissible"><p>' . $notice['message'] . '</p></div>';
 		update_option( 'mastoshare-notice', null );
 	}
 }
