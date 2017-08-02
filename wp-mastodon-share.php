@@ -18,6 +18,8 @@ add_action( 'save_post', 'mastoshare_toot_post' );
 add_action( 'admin_notices', 'mastoshare_admin_notices' );
 add_action( 'post_submitbox_misc_actions', 'mastoshare_add_publish_meta_options' );
 add_action( 'plugins_loaded', 'mastoshare_init' );
+add_action( 'add_meta_boxes', 'mastoshare_add_metabox');
+add_action( 'admin_enqueue_scripts', 'enqueue_scripts' );
 
 /**
  * Mastoshare_init
@@ -29,6 +31,20 @@ add_action( 'plugins_loaded', 'mastoshare_init' );
 function mastoshare_init() {
 	$plugin_dir = basename( dirname( __FILE__ ) );
 	load_plugin_textdomain( 'wp-mastodon-share', false, $plugin_dir . '/languages' );
+}
+
+function enqueue_scripts(){
+
+	global $pagenow;
+
+
+	if (in_array($pagenow, ['post-new.php', 'post.php'])) {
+
+		$plugin_url = plugin_dir_url(__FILE__);
+		wp_enqueue_script( 'toot_editor', $plugin_url . 'js/toot_editor.js', ['jquery'], null, true );
+	}
+
+	
 }
 
 /**
@@ -69,11 +85,11 @@ function mastoshare_show_configuration_page() {
 
 			$tooto_php = new TootoPHP\TootoPHP( $instance );
 			$app = $tooto_php->registerApp( 'Mastodon Share for WP', 'http://www.github.com/kernox' );
-			
-			if($token != get_option('mastoshare-token')){
+
+			if ( get_option( 'mastoshare-token' ) !== $token ) {
 				$app->registerAccessToken( trim( $token ) );
 
-				//Force the token fetch
+				// Force the token fetch.
 				$profile = $app->getUser();
 			}
 
@@ -144,15 +160,27 @@ function mastoshare_add_publish_meta_options( $post ) {
 function mastoshare_toot_post( $id ) {
 
 	$post = get_post( $id );
+
 	$thumb_url = get_the_post_thumbnail_url($id);
-	
+
 	$toot_size = (int) get_option( 'mastoshare-toot-size', 500 );
 
-	$toot_on_mastodon_option = ( 'on'  === $_POST['toot_on_mastodon'] );
+	$toot_on_mastodon_option = 'off';
 
-	if ( $toot_on_mastodon_option && $post->post_status === 'publish' ) {
-		$message = mastoshare_generate_toot( $id, $toot_size, $toot_size );
-		$message = strip_tags( $message );
+
+	if( isset( $_POST['toot_on_mastodon'] ) ) {
+		$toot_on_mastodon_option = ( 'on' === $_POST['toot_on_mastodon'] );
+	}
+
+	if ( 'publish' === $post->post_status && $toot_on_mastodon_option ) {
+
+		//TODO: remplacer par le toot edité dans l'aperçu.
+
+		$message = $_POST['mastoshare_toot'];
+
+
+		//$message = mastoshare_generate_toot( $id, $toot_size, $toot_size );
+
 
 		if ( ! empty( $message ) ) {
 			$instance = get_option( 'mastoshare-instance' );
@@ -172,8 +200,8 @@ function mastoshare_toot_post( $id ) {
 
 				$media = $attachment['id'];
 			}
-			
-			$toot = $app->postStatus( $message, $mode, $media);
+
+			$toot = $app->postStatus( $message, $mode, $media );
 
 			update_post_meta( $post->ID, 'mastoshare-post-status', 'off' );
 
@@ -232,11 +260,21 @@ function mastoshare_generate_toot( $post_id, $excerpt_limit, $goal_limit ) {
 
 	$post = get_post( $post_id );
 
+	$tags = wp_get_post_tags( $post_id);
+	$hashtags = '';
+
+	foreach($tags as $tag) {
+		$hashtags .= '#'.$tag->name.' ';
+	}
+
 	$metas = array(
 		'title' => $post->post_title,
 		'excerpt' => ( empty( $post->post_excerpt ) ) ? $post->post_content : $post->post_excerpt,
 		'permalink' => get_permalink( $post_id ),
+		'tags' => trim( $hashtags ),
 	);
+
+	$metas['excerpt'] = wp_strip_all_tags($metas['excerpt']);
 
 	$metas['excerpt'] = substr(
 		$metas['excerpt'],
@@ -245,9 +283,10 @@ function mastoshare_generate_toot( $post_id, $excerpt_limit, $goal_limit ) {
 	) . '...';
 
 	$message = get_option( 'mastoshare-message' );
+	
 	foreach ( $metas as $key => $value ) {
 		$message = str_replace( '[' . $key . ']', $value, $message );
-	}
+	}	
 
 	if ( strlen( $message ) > $goal_limit ) {
 		// Not good size retry to generate the toot !
@@ -256,4 +295,19 @@ function mastoshare_generate_toot( $post_id, $excerpt_limit, $goal_limit ) {
 		// Good size return the generated toot !
 		return $message;
 	}
+}
+
+function mastoshare_add_metabox() {
+	add_meta_box('mastoshare_metabox', __( 'Toot editor', 'wp-mastodon-share' ), 'mastoshare_metabox', 'post', 'side', 'low');
+}
+
+function mastoshare_metabox( $post ) {
+
+	$id = $post->ID;
+	$toot_size = (int) get_option( 'mastoshare-toot-size', 500 );
+
+	$message = get_option( 'mastoshare-message' );
+
+	echo '<textarea id="mastoshare_toot" name="mastoshare_toot" maxlength="' . $toot_size . '" style="width:100%; min-height:320px; resize:none"></textarea>'.
+	'<textarea id="mastoshare_toot_template" style="display:none">'.$message.'</textarea>';
 }
