@@ -4,6 +4,7 @@ $(document).ready(function(){
 
 	var template = $('#mastoshare_toot_template');
 	var toot = $('#mastoshare_toot');
+	var post_type = $('#post_type').val();
 
 	var title = $('#title');
 	var tags =  $('#post_tag .tagchecklist span');
@@ -16,6 +17,7 @@ $(document).ready(function(){
 	var toot_limit_size = toot.attr('maxlength');
 	var toot_limit_size_span = $('#toot_limit_size');
 	var toot_current_size_span = $('#toot_current_size');
+	var final_excerpt = '';
 
 	toot_limit_size_span.text(toot_limit_size);
 
@@ -35,11 +37,17 @@ $(document).ready(function(){
 		message = template.val();
 		content = tinymce.editors.content.getContent({format : 'text'});		
 
-		if(excerpt.val().length != 0) {
-			final_excerpt = excerpt.val();
-		} else {
+		if(post_type == 'page'){
 			final_excerpt = content;
+		} else {
+
+			if(excerpt.val().length != 0) {
+				final_excerpt = excerpt.val();
+			} else {
+				final_excerpt = content;
+			}
 		}
+	
 
 		var new_slug = $('#editable-post-name').text();
 
@@ -95,23 +103,30 @@ $(document).ready(function(){
 	excerpt.on('keyup', function(){
 		generate_toot();
 	});
-
+	
 	var watcher = setInterval(function() {
 		
 		if(tinymce.editors.length > 0) {
 			var contentEditor = tinymce.editors.content;
 
 			var tagsListReady = $('#tagsdiv-post_tag .tagchecklist span.screen-reader-text').length > 0;
+			
+			//Force tagsListReady to true for page
+			if(post_type == 'page') {
+				tagsListReady = true;
+			}
 
 			if( contentEditor != undefined && tagsListReady) {
 				
-				tinymce.editors.content.on('keyup', function(){
+				tinymce.editors.content.on('keyup', function() {
 					generate_toot();
 				});
 
-				$('#tagsdiv-post_tag').on('DOMSubtreeModified', function() {
-					generate_toot();
-				});	
+				if(post_type == 'post') {
+					$('#tagsdiv-post_tag').on('DOMSubtreeModified', function() {
+						generate_toot();
+					});	
+				}
 
 				$('#edit-slug-box').on('DOMSubtreeModified', function(event) {
 					generate_toot();					
@@ -119,7 +134,7 @@ $(document).ready(function(){
 
 				generate_toot();
 				clearInterval(watcher);				
-			}			
+			}					
 		}
 	}, 500);
 	

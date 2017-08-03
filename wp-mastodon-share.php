@@ -253,7 +253,7 @@ function mastoshare_admin_notices() {
  * @return void
  */
 function mastoshare_add_metabox() {
-	add_meta_box( 'mastoshare_metabox', __( 'Toot editor', 'wp-mastodon-share' ), 'mastoshare_metabox', 'post', 'side', 'low' );
+	add_meta_box( 'mastoshare_metabox', __( 'Toot editor', 'wp-mastodon-share' ), 'mastoshare_metabox', ['post', 'page'], 'side', 'low' );
 }
 
 /**
@@ -271,5 +271,6 @@ function mastoshare_metabox( $post ) {
 
 	echo '<textarea id="mastoshare_toot" name="mastoshare_toot" maxlength="' . $toot_size . '" style="width:100%; min-height:320px; resize:none"></textarea>'.
 	'<textarea id="mastoshare_toot_template" style="display:none">' . $message . '</textarea>' . 
-	'<p>' . __( 'Chars', 'wp-mastodon-share' ) . ': <span id="toot_current_size">?</span> / <span id="toot_limit_size">?</p>';
+	'<p>' . __( 'Chars', 'wp-mastodon-share' ) . ': <span id="toot_current_size">?</span> / <span id="toot_limit_size">?</p>' .
+	'<input type="hidden" id="post_type" value="'.$post->post_type.'">';
 }
