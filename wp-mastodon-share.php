@@ -18,7 +18,7 @@ add_action( 'save_post', 'mastoshare_toot_post' );
 add_action( 'admin_notices', 'mastoshare_admin_notices' );
 add_action( 'post_submitbox_misc_actions', 'mastoshare_add_publish_meta_options' );
 add_action( 'plugins_loaded', 'mastoshare_init' );
-add_action( 'add_meta_boxes', 'mastoshare_add_metabox');
+add_action( 'add_meta_boxes', 'mastoshare_add_metabox' );
 add_action( 'admin_enqueue_scripts', 'enqueue_scripts' );
 
 /**
@@ -33,18 +33,20 @@ function mastoshare_init() {
 	load_plugin_textdomain( 'wp-mastodon-share', false, $plugin_dir . '/languages' );
 }
 
-function enqueue_scripts(){
+/**
+ * Enqueue_scripts
+ *
+ * @return void
+ */
+function enqueue_scripts() {
 
 	global $pagenow;
 
+	if ( in_array( $pagenow, [ 'post-new.php', 'post.php' ] ) ) {
 
-	if (in_array($pagenow, ['post-new.php', 'post.php'])) {
-
-		$plugin_url = plugin_dir_url(__FILE__);
-		wp_enqueue_script( 'toot_editor', $plugin_url . 'js/toot_editor.js', ['jquery'], null, true );
+		$plugin_url = plugin_dir_url( __FILE__ );
+		wp_enqueue_script( 'toot_editor', $plugin_url . 'js/toot_editor.js', [ 'jquery' ], null, true );
 	}
-
-	
 }
 
 /**
@@ -108,6 +110,11 @@ function mastoshare_show_configuration_page() {
 
 	if ( isset( $_POST['obtain_key'] ) ) {
 
+		$tootophp_json = plugin_dir_path( __FILE__ ).'tootophp/tootophp.json';
+		if( file_exists($tootophp_json) ) {
+			unlink($tootophp_json);
+		}
+
 		$is_valid_nonce = wp_verify_nonce( $_POST['_wpnonce'], 'instance-access-key' );
 
 		if ( $is_valid_nonce ) {
@@ -117,6 +124,7 @@ function mastoshare_show_configuration_page() {
 			update_option( 'mastoshare-instance', $instance );
 
 			$tooto_php = new TootoPHP\TootoPHP( $instance );
+			
 
 			// Setting up your App name and your website !
 			$app = $tooto_php->registerApp( 'Mastodon Share for WP', 'http://www.github.com/kernox' );
