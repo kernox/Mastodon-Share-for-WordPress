@@ -4,7 +4,7 @@
  * Plugin Name: Mastodon Share
  * Plugin URI: https://github.com/kernox/mastoshare-wp
  * Description: Share WordPress posts on a mastodon instance.
- * Version: 0.7
+ * Version: 0.8
  * Author: Hellexis
  * Author URI: https://github.com/kernox
  * Text Domain: wp-mastodon-share
@@ -110,9 +110,9 @@ function mastoshare_show_configuration_page() {
 
 	if ( isset( $_POST['obtain_key'] ) ) {
 
-		$tootophp_json = plugin_dir_path( __FILE__ ).'tootophp/tootophp.json';
-		if( file_exists($tootophp_json) ) {
-			unlink($tootophp_json);
+		$tootophp_json = plugin_dir_path( __FILE__ ) . 'tootophp/tootophp.json';
+		if( file_exists( $tootophp_json ) ) {
+			unlink( $tootophp_json );
 		}
 
 		$is_valid_nonce = wp_verify_nonce( $_POST['_wpnonce'], 'instance-access-key' );
@@ -124,7 +124,6 @@ function mastoshare_show_configuration_page() {
 			update_option( 'mastoshare-instance', $instance );
 
 			$tooto_php = new TootoPHP\TootoPHP( $instance );
-			
 
 			// Setting up your App name and your website !
 			$app = $tooto_php->registerApp( 'Mastodon Share for WP', 'http://www.github.com/kernox' );
@@ -173,8 +172,7 @@ function mastoshare_toot_post( $id ) {
 
 	$toot_size = (int) get_option( 'mastoshare-toot-size', 500 );
 
-	$toot_on_mastodon_option = 'off';
-
+	$toot_on_mastodon_option = false;
 
 	if( isset( $_POST['toot_on_mastodon'] ) ) {
 		$toot_on_mastodon_option = ( 'on' === $_POST['toot_on_mastodon'] );
@@ -196,7 +194,7 @@ function mastoshare_toot_post( $id ) {
 
 			if ( $thumb_url ) {
 
-				$thumb_path = str_replace(get_site_url(), get_home_path(), $thumb_url);
+				$thumb_path = str_replace( get_site_url(), get_home_path(), $thumb_url );
 
 				$attachment = $app->createAttachement( $thumb_path );
 
@@ -249,10 +247,21 @@ function mastoshare_admin_notices() {
 	}
 }
 
+/**
+ * Mastoshare_add_metabox
+ *
+ * @return void
+ */
 function mastoshare_add_metabox() {
-	add_meta_box('mastoshare_metabox', __( 'Toot editor', 'wp-mastodon-share' ), 'mastoshare_metabox', 'post', 'side', 'low');
+	add_meta_box( 'mastoshare_metabox', __( 'Toot editor', 'wp-mastodon-share' ), 'mastoshare_metabox', 'post', 'side', 'low' );
 }
 
+/**
+ * Mastoshare_metabox
+ *
+ * @param WP_Post $post the current post.
+ * @return void
+ */
 function mastoshare_metabox( $post ) {
 
 	$id = $post->ID;
@@ -261,6 +270,6 @@ function mastoshare_metabox( $post ) {
 	$message = get_option( 'mastoshare-message' );
 
 	echo '<textarea id="mastoshare_toot" name="mastoshare_toot" maxlength="' . $toot_size . '" style="width:100%; min-height:320px; resize:none"></textarea>'.
-	'<textarea id="mastoshare_toot_template" style="display:none">'.$message.'</textarea>' . 
-	'<p>Chars : <span id="toot_current_size">?</span> / <span id="toot_limit_size">?</p>';
+	'<textarea id="mastoshare_toot_template" style="display:none">' . $message . '</textarea>' . 
+	'<p>' . __( 'Chars', 'wp-mastodon-share' ) . ': <span id="toot_current_size">?</span> / <span id="toot_limit_size">?</p>';
 }

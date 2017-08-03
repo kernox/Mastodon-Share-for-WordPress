@@ -3,6 +3,7 @@ var $ = jQuery;
 $(document).ready(function(){	
 
 	var template = $('#mastoshare_toot_template');
+	var toot = $('#mastoshare_toot');
 
 	var title = $('#title');
 	var tags =  $('#post_tag .tagchecklist span');
@@ -12,11 +13,9 @@ $(document).ready(function(){
 	var final_permalink = permalink.text();
 	var slug = $('#editable-post-name').text();
 	var message = '';
-	var toot_limit_size = 500;
+	var toot_limit_size = toot.attr('maxlength');
 	var toot_limit_size_span = $('#toot_limit_size');
 	var toot_current_size_span = $('#toot_current_size');
-
-	var toot = $('#mastoshare_toot');
 
 	toot_limit_size_span.text(toot_limit_size);
 
@@ -29,10 +28,6 @@ $(document).ready(function(){
 		});
 
 		return hashtags.trim();
-	}
-
-	function sleep(ms) {
-		return new Promise(resolve => setTimeout(resolve, ms));
 	}
 
 	function generate_toot(reduce_of = 0) {
@@ -53,9 +48,12 @@ $(document).ready(function(){
 			slug = new_slug;
 		}
 		
-		var words = final_excerpt.split(' ');
-		words = words.slice(reduce_of);
-		final_excerpt = words.join(' ');
+		//If toot reduce needed
+		if(reduce_of !== 0) {
+			var words = final_excerpt.split(' ');
+			words = words.slice(0, reduce_of);	
+			final_excerpt = words.join(' ');
+		}
 
 		var metas = [
 			{name: 'title', value: title.val()},
@@ -71,7 +69,13 @@ $(document).ready(function(){
 		}
 		
 		if (message.length > toot_limit_size) {
-			generate_toot(reduce_of + 1);
+
+			if(reduce_of == 0){
+				reduce_of = -1;
+			} else {
+				reduce_of = reduce_of -1;
+			}
+			generate_toot(reduce_of);
 		} else {
 			toot_current_size_span.text(message.length);
 			toot.val(message);
@@ -114,10 +118,8 @@ $(document).ready(function(){
 				});
 
 				generate_toot();
-				clearInterval(watcher);	
-				
-			}
-			
+				clearInterval(watcher);				
+			}			
 		}
 	}, 500);
 	
