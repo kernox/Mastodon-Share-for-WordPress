@@ -12,8 +12,13 @@ $(document).ready(function(){
 	var final_permalink = permalink.text();
 	var slug = $('#editable-post-name').text();
 	var message = '';
+	var toot_limit_size = 500;
+	var toot_limit_size_span = $('#toot_limit_size');
+	var toot_current_size_span = $('#toot_current_size');
 
-	var toot = document.getElementById('mastoshare_toot');
+	var toot = $('#mastoshare_toot');
+
+	toot_limit_size_span.text(toot_limit_size);
 
 	function generate_hashtags() {
 
@@ -26,7 +31,11 @@ $(document).ready(function(){
 		return hashtags.trim();
 	}
 
-	function generate_toot() {
+	function sleep(ms) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
+	function generate_toot(reduce_of = 0) {
 
 		message = template.val();
 		content = tinymce.editors.content.getContent({format : 'text'});		
@@ -42,24 +51,38 @@ $(document).ready(function(){
 		if(new_slug.length > 0) {
 			final_permalink = final_permalink.replace(slug, new_slug);
 			slug = new_slug;
-		}		
+		}
+		
+		var words = final_excerpt.split(' ');
+		words = words.slice(reduce_of);
+		final_excerpt = words.join(' ');
 
 		var metas = [
 			{name: 'title', value: title.val()},
 			{name: 'excerpt', value: final_excerpt},
 			{name: 'permalink', value: final_permalink},
 			{name: 'tags', value: generate_hashtags()}
-		];
+		];		
 
 		for(i in metas) {
 			var item = metas[i];
 
 			message = message.replace('[' + item.name + ']', item.value);
-		}		
+		}
+		
+		if (message.length > toot_limit_size) {
+			generate_toot(reduce_of + 1);
+		} else {
+			toot_current_size_span.text(message.length);
+			toot.val(message);
 
-		toot.value = message;
+		}	
 
 	};
+
+	toot.bind('input propertychange', function() {
+		toot_current_size_span.text(toot.val().length);
+	});
 
 	title.on('keyup', function(){
 		generate_toot();

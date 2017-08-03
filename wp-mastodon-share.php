@@ -182,13 +182,7 @@ function mastoshare_toot_post( $id ) {
 
 	if ( 'publish' === $post->post_status && $toot_on_mastodon_option ) {
 
-		//TODO: remplacer par le toot edité dans l'aperçu.
-
 		$message = $_POST['mastoshare_toot'];
-
-
-		//$message = mastoshare_generate_toot( $id, $toot_size, $toot_size );
-
 
 		if ( ! empty( $message ) ) {
 			$instance = get_option( 'mastoshare-instance' );
@@ -255,56 +249,6 @@ function mastoshare_admin_notices() {
 	}
 }
 
-/**
- * Mastoshare_generate_toot
- * Generate the toot at the right size
- *
- * @param int $post_id The post ID.
- * @param int $excerpt_limit The current message limit tested.
- * @param int $goal_limit The final message limit.
- * @return string
- */
-function mastoshare_generate_toot( $post_id, $excerpt_limit, $goal_limit ) {
-
-	$post = get_post( $post_id );
-
-	$tags = wp_get_post_tags( $post_id);
-	$hashtags = '';
-
-	foreach($tags as $tag) {
-		$hashtags .= '#'.$tag->name.' ';
-	}
-
-	$metas = array(
-		'title' => $post->post_title,
-		'excerpt' => ( empty( $post->post_excerpt ) ) ? $post->post_content : $post->post_excerpt,
-		'permalink' => get_permalink( $post_id ),
-		'tags' => trim( $hashtags ),
-	);
-
-	$metas['excerpt'] = wp_strip_all_tags($metas['excerpt']);
-
-	$metas['excerpt'] = substr(
-		$metas['excerpt'],
-		0,
-		$excerpt_limit
-	) . '...';
-
-	$message = get_option( 'mastoshare-message' );
-	
-	foreach ( $metas as $key => $value ) {
-		$message = str_replace( '[' . $key . ']', $value, $message );
-	}	
-
-	if ( strlen( $message ) > $goal_limit ) {
-		// Not good size retry to generate the toot !
-		return mastoshare_generate_toot( $post_id, $excerpt_limit - 5, $goal_limit );
-	} else {
-		// Good size return the generated toot !
-		return $message;
-	}
-}
-
 function mastoshare_add_metabox() {
 	add_meta_box('mastoshare_metabox', __( 'Toot editor', 'wp-mastodon-share' ), 'mastoshare_metabox', 'post', 'side', 'low');
 }
@@ -317,5 +261,6 @@ function mastoshare_metabox( $post ) {
 	$message = get_option( 'mastoshare-message' );
 
 	echo '<textarea id="mastoshare_toot" name="mastoshare_toot" maxlength="' . $toot_size . '" style="width:100%; min-height:320px; resize:none"></textarea>'.
-	'<textarea id="mastoshare_toot_template" style="display:none">'.$message.'</textarea>';
+	'<textarea id="mastoshare_toot_template" style="display:none">'.$message.'</textarea>' . 
+	'<p>Chars : <span id="toot_current_size">?</span> / <span id="toot_limit_size">?</p>';
 }
