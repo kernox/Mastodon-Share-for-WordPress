@@ -80,7 +80,7 @@ function mastoshare_show_configuration_page() {
 
 		$is_valid_nonce = wp_verify_nonce( $_POST['_wpnonce'], 'mastoshare-configuration' );
 
-		if ( $is_valid_nonce ) {			
+		if ( $is_valid_nonce ) {
 			$instance = get_option( 'mastoshare-instance' );
 			$message = $_POST['message'];
 			$token = sanitize_key( $_POST['token'] );
@@ -180,7 +180,7 @@ function mastoshare_toot_post( $id ) {
 
 	if ( 'publish' === $post->post_status && $toot_on_mastodon_option ) {
 
-		$message = $_POST['mastoshare_toot'];
+		$message = stripslashes($_POST['mastoshare_toot']);
 
 		if ( ! empty( $message ) ) {
 			$instance = get_option( 'mastoshare-instance' );
@@ -270,7 +270,7 @@ function mastoshare_metabox( $post ) {
 	$message = get_option( 'mastoshare-message' );
 
 	echo '<textarea id="mastoshare_toot" name="mastoshare_toot" maxlength="' . $toot_size . '" style="width:100%; min-height:320px; resize:none"></textarea>'.
-	'<textarea id="mastoshare_toot_template" style="display:none">' . $message . '</textarea>' . 
+	'<textarea id="mastoshare_toot_template" style="display:none">' . $message . '</textarea>' .
 	'<p>' . __( 'Chars', 'wp-mastodon-share' ) . ': <span id="toot_current_size">?</span> / <span id="toot_limit_size">?</p>' .
 	'<input type="hidden" id="post_type" value="'.$post->post_type.'">';
 }
