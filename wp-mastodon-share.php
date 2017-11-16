@@ -62,14 +62,14 @@ function mastoshare_show_configuration_page() {
 
 		$is_valid_nonce = wp_verify_nonce( $_POST['_wpnonce'], 'mastoshare-configuration' );
 
-		if ( $is_valid_nonce ) {			
+		if ( $is_valid_nonce ) {
 			$instance = get_option( 'mastoshare-instance' );
-			$message = $_POST['message'];
+			$message = stripslashes($_POST['message']);
 			$token = sanitize_key( $_POST['token'] );
 
 			$tooto_php = new TootoPHP\TootoPHP( $instance );
 			$app = $tooto_php->registerApp( 'Mastodon Share for WP', 'http://www.github.com/kernox' );
-			
+
 			if($token != get_option('mastoshare-token')){
 				$app->registerAccessToken( trim( $token ) );
 
@@ -89,6 +89,7 @@ function mastoshare_show_configuration_page() {
 	$message = get_option( 'mastoshare-message', '[title] - [excerpt] - [permalink]' );
 	$mode = get_option( 'mastoshare-mode', 'public' );
 	$toot_size = get_option( 'mastoshare-toot-size', 500 );
+
 
 	if ( isset( $_POST['obtain_key'] ) ) {
 
@@ -145,7 +146,7 @@ function mastoshare_toot_post( $id ) {
 
 	$post = get_post( $id );
 	$thumb_url = get_the_post_thumbnail_url($id);
-	
+
 	$toot_size = (int) get_option( 'mastoshare-toot-size', 500 );
 
 	$toot_on_mastodon_option = ( 'on'  === $_POST['toot_on_mastodon'] );
@@ -172,7 +173,7 @@ function mastoshare_toot_post( $id ) {
 
 				$media = $attachment['id'];
 			}
-			
+
 			$toot = $app->postStatus( $message, $mode, $media);
 
 			update_post_meta( $post->ID, 'mastoshare-post-status', 'off' );
