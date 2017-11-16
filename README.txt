@@ -14,6 +14,15 @@ Define your message and your toot mode.
 Finally set the size of your future toots and save the configuration.
 
 == Changelog ==
+
+= 0.8 =
+Add toot editor
+Fix the splitted words bug
+
+= 0.7 =
+* Add thumbnail support on Mastodon Toot
+* Fix access token lifetime bug
+
 = 0.6 =
 * Move the configuration menu in settings
 

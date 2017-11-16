@@ -4,7 +4,7 @@
  * Plugin Name: Mastodon Share
  * Plugin URI: https://github.com/kernox/mastoshare-wp
  * Description: Share WordPress posts on a mastodon instance.
- * Version: 0.7
+ * Version: 0.8
  * Author: Hellexis
  * Author URI: https://github.com/kernox
  * Text Domain: wp-mastodon-share
@@ -18,6 +18,8 @@ add_action( 'save_post', 'mastoshare_toot_post' );
 add_action( 'admin_notices', 'mastoshare_admin_notices' );
 add_action( 'post_submitbox_misc_actions', 'mastoshare_add_publish_meta_options' );
 add_action( 'plugins_loaded', 'mastoshare_init' );
+add_action( 'add_meta_boxes', 'mastoshare_add_metabox' );
+add_action( 'admin_enqueue_scripts', 'enqueue_scripts' );
 
 /**
  * Mastoshare_init
@@ -29,6 +31,22 @@ add_action( 'plugins_loaded', 'mastoshare_init' );
 function mastoshare_init() {
 	$plugin_dir = basename( dirname( __FILE__ ) );
 	load_plugin_textdomain( 'wp-mastodon-share', false, $plugin_dir . '/languages' );
+}
+
+/**
+ * Enqueue_scripts
+ *
+ * @return void
+ */
+function enqueue_scripts() {
+
+	global $pagenow;
+
+	if ( in_array( $pagenow, [ 'post-new.php', 'post.php' ] ) ) {
+
+		$plugin_url = plugin_dir_url( __FILE__ );
+		wp_enqueue_script( 'toot_editor', $plugin_url . 'js/toot_editor.js', [ 'jquery' ], null, true );
+	}
 }
 
 /**
@@ -73,7 +91,7 @@ function mastoshare_show_configuration_page() {
 			if($token != get_option('mastoshare-token')){
 				$app->registerAccessToken( trim( $token ) );
 
-				//Force the token fetch
+				// Force the token fetch.
 				$profile = $app->getUser();
 			}
 
@@ -92,6 +110,11 @@ function mastoshare_show_configuration_page() {
 
 
 	if ( isset( $_POST['obtain_key'] ) ) {
+
+		$tootophp_json = plugin_dir_path( __FILE__ ) . 'tootophp/tootophp.json';
+		if( file_exists( $tootophp_json ) ) {
+			unlink( $tootophp_json );
+		}
 
 		$is_valid_nonce = wp_verify_nonce( $_POST['_wpnonce'], 'instance-access-key' );
 
@@ -149,11 +172,15 @@ function mastoshare_toot_post( $id ) {
 
 	$toot_size = (int) get_option( 'mastoshare-toot-size', 500 );
 
-	$toot_on_mastodon_option = ( 'on'  === $_POST['toot_on_mastodon'] );
+	$toot_on_mastodon_option = false;
 
-	if ( $toot_on_mastodon_option && $post->post_status === 'publish' ) {
-		$message = mastoshare_generate_toot( $id, $toot_size, $toot_size );
-		$message = strip_tags( $message );
+	if( isset( $_POST['toot_on_mastodon'] ) ) {
+		$toot_on_mastodon_option = ( 'on' === $_POST['toot_on_mastodon'] );
+	}
+
+	if ( 'publish' === $post->post_status && $toot_on_mastodon_option ) {
+
+		$message = stripslashes($_POST['mastoshare_toot']);
 
 		if ( ! empty( $message ) ) {
 			$instance = get_option( 'mastoshare-instance' );
@@ -167,14 +194,14 @@ function mastoshare_toot_post( $id ) {
 
 			if ( $thumb_url ) {
 
-				$thumb_path = str_replace(get_site_url(), get_home_path(), $thumb_url);
+				$thumb_path = str_replace( get_site_url(), get_home_path(), $thumb_url );
 
 				$attachment = $app->createAttachement( $thumb_path );
 
 				$media = $attachment['id'];
 			}
 
-			$toot = $app->postStatus( $message, $mode, $media);
+			$toot = $app->postStatus( $message, $mode, $media );
 
 			update_post_meta( $post->ID, 'mastoshare-post-status', 'off' );
 
@@ -221,40 +248,29 @@ function mastoshare_admin_notices() {
 }
 
 /**
- * Mastoshare_generate_toot
- * Generate the toot at the right size
+ * Mastoshare_add_metabox
  *
- * @param int $post_id The post ID.
- * @param int $excerpt_limit The current message limit tested.
- * @param int $goal_limit The final message limit.
- * @return string
+ * @return void
  */
-function mastoshare_generate_toot( $post_id, $excerpt_limit, $goal_limit ) {
+function mastoshare_add_metabox() {
+	add_meta_box( 'mastoshare_metabox', __( 'Toot editor', 'wp-mastodon-share' ), 'mastoshare_metabox', ['post', 'page'], 'side', 'low' );
+}
 
-	$post = get_post( $post_id );
+/**
+ * Mastoshare_metabox
+ *
+ * @param WP_Post $post the current post.
+ * @return void
+ */
+function mastoshare_metabox( $post ) {
 
-	$metas = array(
-		'title' => $post->post_title,
-		'excerpt' => ( empty( $post->post_excerpt ) ) ? $post->post_content : $post->post_excerpt,
-		'permalink' => get_permalink( $post_id ),
-	);
-
-	$metas['excerpt'] = substr(
-		$metas['excerpt'],
-		0,
-		$excerpt_limit
-	) . '...';
+	$id = $post->ID;
+	$toot_size = (int) get_option( 'mastoshare-toot-size', 500 );
 
 	$message = get_option( 'mastoshare-message' );
-	foreach ( $metas as $key => $value ) {
-		$message = str_replace( '[' . $key . ']', $value, $message );
-	}
 
-	if ( strlen( $message ) > $goal_limit ) {
-		// Not good size retry to generate the toot !
-		return mastoshare_generate_toot( $post_id, $excerpt_limit - 5, $goal_limit );
-	} else {
-		// Good size return the generated toot !
-		return $message;
-	}
+	echo '<textarea id="mastoshare_toot" name="mastoshare_toot" maxlength="' . $toot_size . '" style="width:100%; min-height:320px; resize:none"></textarea>'.
+	'<textarea id="mastoshare_toot_template" style="display:none">' . $message . '</textarea>' .
+	'<p>' . __( 'Chars', 'wp-mastodon-share' ) . ': <span id="toot_current_size">?</span> / <span id="toot_limit_size">?</p>' .
+	'<input type="hidden" id="post_type" value="'.$post->post_type.'">';
 }
