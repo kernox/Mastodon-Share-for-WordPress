@@ -82,7 +82,7 @@ function mastoshare_show_configuration_page() {
 
 		if ( $is_valid_nonce ) {
 			$instance = get_option( 'mastoshare-instance' );
-			$message = $_POST['message'];
+			$message = stripslashes($_POST['message']);
 			$token = sanitize_key( $_POST['token'] );
 
 			$tooto_php = new TootoPHP\TootoPHP( $instance );
