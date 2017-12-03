@@ -1,6 +1,6 @@
 var $ = jQuery;
 
-$(document).ready(function(){	
+$(function(){
 
 	var template = $('#mastoshare_toot_template');
 	var toot = $('#mastoshare_toot');
@@ -42,7 +42,7 @@ $(document).ready(function(){
 		} else {
 
 			if(excerpt.val().length != 0) {
-				final_excerpt = excerpt.val();
+				final_excerpt = excerpt.val().replace(/<(?!\/?>)[^>]*>/gm, '');
 			} else {
 				final_excerpt = content;
 			}
@@ -103,39 +103,59 @@ $(document).ready(function(){
 	excerpt.on('keyup', function(){
 		generate_toot();
 	});
-	
-	var watcher = setInterval(function() {
-		
-		if(tinymce.editors.length > 0) {
-			var contentEditor = tinymce.editors.content;
 
-			var tagsListReady = $('#tagsdiv-post_tag .tagchecklist span.screen-reader-text').length > 0;
-			
-			//Force tagsListReady to true for page
-			if(post_type == 'page') {
-				tagsListReady = true;
-			}
+	var watcher = setInterval(function(){
+		if(tinymce.activeEditor){
 
-			if( contentEditor != undefined && tagsListReady) {
-				
-				tinymce.editors.content.on('keyup', function() {
-					generate_toot();
-				});
+			//Stop the watcher when activeEditor catch
+			clearInterval(watcher);
 
-				if(post_type == 'post') {
-					$('#tagsdiv-post_tag').on('DOMSubtreeModified', function() {
-						generate_toot();
-					});	
-				}
+			//First generation of the toot
+			generate_toot();
 
-				$('#edit-slug-box').on('DOMSubtreeModified', function(event) {
-					generate_toot();					
-				});
-
-				generate_toot();
-				clearInterval(watcher);				
-			}					
+			//Regenerate the toot when content change
+			tinymce.activeEditor.on('keyup', function(){
+                generate_toot();
+			});
 		}
-	}, 500);
+	},1000);
+
+	
+	// var watcher = setInterval(function() {
+	//
+	// 	if(tinymce.editors.length > 0) {
+	// 		var contentEditor = tinymce.editors.content;
+    //
+	// 		var tagsListReady = $('#tagsdiv-post_tag .tagchecklist span.screen-reader-text').length > 0;
+	//
+	// 		//Force tagsListReady to true for page
+	// 		if(post_type == 'page') {
+	// 			tagsListReady = true;
+	// 		}
+    //
+	// 		if( contentEditor != undefined && tagsListReady) {
+	//
+	// 			tinymce.editors.content.on('keyup', function() {
+	// 				console.log('press');
+	// 				generate_toot();
+	// 			});
+    //
+	// 			if(post_type == 'post') {
+	// 				$('#tagsdiv-post_tag').on('DOMSubtreeModified', function() {
+	// 					generate_toot();
+	// 				});
+	// 			}
+    //
+	// 			$('#edit-slug-box').on('DOMSubtreeModified', function(event) {
+	// 				generate_toot();
+	// 			});
+    //
+	// 			generate_toot();
+	// 			clearInterval(watcher);
+	// 		}
+	// 	}
+	// }, 500);
+
+	//generate_toot();
 	
 });

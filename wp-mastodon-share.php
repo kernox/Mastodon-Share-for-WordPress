@@ -4,7 +4,7 @@
  * Plugin Name: Mastodon Share
  * Plugin URI: https://github.com/kernox/mastoshare-wp
  * Description: Share WordPress posts on a mastodon instance.
- * Version: 0.8
+ * Version: 0.9
  * Author: Hellexis
  * Author URI: https://github.com/kernox
  * Text Domain: wp-mastodon-share
@@ -269,7 +269,7 @@ function mastoshare_metabox( $post ) {
 
 	$message = get_option( 'mastoshare-message' );
 
-	echo '<textarea id="mastoshare_toot" name="mastoshare_toot" maxlength="' . $toot_size . '" style="width:100%; min-height:320px; resize:none"></textarea>'.
+	echo '<textarea id="mastoshare_toot" name="mastoshare_toot" maxlength="' . $toot_size . '" style="width:100%; min-height:320px; resize:none">Loading, please wait ...</textarea>'.
 	'<textarea id="mastoshare_toot_template" style="display:none">' . $message . '</textarea>' .
 	'<p>' . __( 'Chars', 'wp-mastodon-share' ) . ': <span id="toot_current_size">?</span> / <span id="toot_limit_size">?</p>' .
 	'<input type="hidden" id="post_type" value="'.$post->post_type.'">';
