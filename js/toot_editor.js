@@ -2,21 +2,15 @@ var $ = jQuery;
 
 $(function(){
 
+	var message = '';
+
 	var template = $('#mastoshare_toot_template');
-
 	var toot = $('#mastoshare_toot');
-
 	var title = $('#title');
+
 	var tags =  $('#post_tag .tagchecklist span');
 	var excerpt = $('#excerpt');
 
-
-
-	var slug_box = $('#edit-slug-box');
-	var slug = $('#editable-post-name').text();
-
-
-	var message = '';
 	var toot_limit_size = toot.attr('maxlength');
 	var toot_limit_size_span = $('#toot_limit_size');
 	var toot_current_size_span = $('#toot_current_size');
@@ -81,6 +75,7 @@ $(function(){
 	}
 
 	function get_excerpt() {
+
 		var content = tinymce.editors.content.getContent({format : 'text'});
 
 		if(typenow != 'page'){
@@ -124,7 +119,6 @@ $(function(){
 	});
 
 	$('#edit-slug-box').on('DOMSubtreeModified', function() {
-		console.log('modification du permalien');
 		generate_toot();
 	});
 

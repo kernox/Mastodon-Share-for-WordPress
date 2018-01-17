@@ -16,7 +16,7 @@ Finally set the size of your future toots and save the configuration.
 == Changelog ==
 
 = 0.9 =
-* Fix some bugs
+* Fix permalink bug on toot editor
 
 = 0.8 =
 * Add toot editor
