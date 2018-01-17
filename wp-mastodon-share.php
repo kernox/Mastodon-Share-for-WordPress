@@ -205,6 +205,8 @@ function mastoshare_toot_post( $id ) {
 
 			update_post_meta( $post->ID, 'mastoshare-post-status', 'off' );
 
+			add_action('admin_notices', 'mastoshare_notice_toot_success');
+
 			if ( isset( $toot['error'] ) ) {
 				update_option(
 					'mastoshare-notice',
@@ -226,7 +228,7 @@ function mastoshare_toot_post( $id ) {
 						)
 					)
 				);
-			}
+			}			
 		}
 	}
 }
