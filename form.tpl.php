@@ -24,26 +24,15 @@
 <div class="wrap">
 	<h1 class="big-title"><?php esc_html_e( 'Mastodon Share Configuration', 'wp-mastodon-share' ); ?></h1>
 	<form method="POST">
-		<?php wp_nonce_field( 'instance-access-key' ); ?>
+		<?php wp_nonce_field( 'mastoshare-configuration' ); ?>
 		<div class="block">
 			<label for="instance"><?php esc_html_e( 'Instance', 'wp-mastodon-share' ); ?></label>
 			<input type="text" id="instance" name="instance" size="80" value="<?php esc_attr_e( $instance ); ?>">
-			<p>
-				<input
-					class="button button-secondary"
-					type="submit" name="obtain_key"
-					id="obtain_key"
-					value="<?php esc_attr_e( 'Obtain Access Key', 'wp-mastodon-share' ); ?>"
-				>
-			</p>
 		</div>
-	</form>
 
-	<form method="POST">
-		<?php wp_nonce_field( 'mastoshare-configuration' ); ?>
 		<div class="block">
 			<label for="token"><?php esc_html_e( 'Access Key', 'wp-mastodon-share' ); ?></label>
-			<input type="text" name="token" id="token" value="<?php esc_attr_e( $token ); ?>" size="80" required>
+			<?php echo $token ?>
 		</div>
 
 

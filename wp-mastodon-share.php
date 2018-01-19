@@ -11,7 +11,8 @@
  * Domain Path: /languages
  */
 
-require_once 'tootophp/autoload.php';
+
+require_once 'client.php';
 
 add_action( 'admin_menu', 'mastoshare_configuration_page' );
 add_action( 'save_post', 'mastoshare_toot_post' );
@@ -31,6 +32,35 @@ add_action( 'admin_enqueue_scripts', 'enqueue_scripts' );
 function mastoshare_init() {
 	$plugin_dir = basename( dirname( __FILE__ ) );
 	load_plugin_textdomain( 'wp-mastodon-share', false, $plugin_dir . '/languages' );
+
+	if(isset($_GET['code'])){
+		$code = $_GET['code'];
+		$client_id = get_option('mastoshare-client-id');
+		$client_secret = get_option('mastoshare-client-secret');
+
+		if(!empty($code) && !empty($client_id) && !empty($client_secret))
+		{
+			echo 'Authentification, please wait ...';
+			update_option( 'mastoshare-token', 'nada' );
+
+			$instance = get_option( 'mastoshare-instance' );
+			$client = new Client($instance);
+			$token = $client->get_bearer_token($client_id, $client_secret, $code, get_admin_url());
+
+			update_option('mastoshare-client-id', '');
+			update_option('mastoshare-client-secret', '');
+			update_option('mastoshare-token', $token->access_token);
+			$redirect_url = get_admin_url().'options-general.php?page=wp-mastodon-share';
+		}
+		else
+		{
+			//Probably hack, redirect to homepage
+			$redirect_url = home_url();
+		}
+
+		wp_redirect($redirect_url);
+		exit;
+	}
 }
 
 /**
@@ -81,24 +111,27 @@ function mastoshare_show_configuration_page() {
 		$is_valid_nonce = wp_verify_nonce( $_POST['_wpnonce'], 'mastoshare-configuration' );
 
 		if ( $is_valid_nonce ) {
-			$instance = get_option( 'mastoshare-instance' );
+			$instance = esc_url( $_POST['instance'] );
 			$message = stripslashes($_POST['message']);
-			$token = sanitize_key( $_POST['token'] );
 
-			$tooto_php = new TootoPHP\TootoPHP( $instance );
-			$app = $tooto_php->registerApp( 'Mastodon Share for WP', 'http://www.github.com/kernox' );
+			$client = new Client($instance);
+			$redirect_url = get_admin_url();
+			$auth_url = $client->register_app($redirect_url);
 
-			if($token != get_option('mastoshare-token')){
-				$app->registerAccessToken( trim( $token ) );
 
-				// Force the token fetch.
-				$profile = $app->getUser();
-			}
+			update_option('mastoshare-client-id', $client->get_client_id());
+			update_option('mastoshare-client-secret', $client->get_client_secret());
 
+			update_option( 'mastoshare-instance', $instance );
 			update_option( 'mastoshare-message', sanitize_textarea_field( $message ) );
-			update_option( 'mastoshare-token', $token );
 			update_option( 'mastoshare-mode', sanitize_text_field( $_POST['mode'] ) );
 			update_option( 'mastoshare-toot-size', (int) $_POST['size'] );
+
+
+			//var_dump($auth_url);
+			echo '<meta http-equiv="refresh" content="0; url=' . $auth_url . '" />';
+			echo 'Redirect to '.$instance;
+			exit;
 		}
 	}
 
@@ -107,35 +140,6 @@ function mastoshare_show_configuration_page() {
 	$message = get_option( 'mastoshare-message', '[title] - [excerpt] - [permalink]' );
 	$mode = get_option( 'mastoshare-mode', 'public' );
 	$toot_size = get_option( 'mastoshare-toot-size', 500 );
-
-
-	if ( isset( $_POST['obtain_key'] ) ) {
-
-		$tootophp_json = plugin_dir_path( __FILE__ ) . 'tootophp/tootophp.json';
-		if( file_exists( $tootophp_json ) ) {
-			unlink( $tootophp_json );
-		}
-
-		$is_valid_nonce = wp_verify_nonce( $_POST['_wpnonce'], 'instance-access-key' );
-
-		if ( $is_valid_nonce ) {
-			$instance = esc_url( $_POST['instance'] );
-			$instance = parse_url( $instance )['host'];
-
-			update_option( 'mastoshare-instance', $instance );
-
-			$tooto_php = new TootoPHP\TootoPHP( $instance );
-
-			// Setting up your App name and your website !
-			$app = $tooto_php->registerApp( 'Mastodon Share for WP', 'http://www.github.com/kernox' );
-			if ( $app === false ) {
-				throw new Exception( 'Problem during register app' );
-			}
-
-			$auth_url = $app->getAuthUrl();
-			echo '<script>window.open("' .  $auth_url  . '")</script>';
-		}
-	}
 
 	include 'form.tpl.php';
 }
