@@ -15,11 +15,12 @@ class Client
 		$result = $this->_post('/api/v1/apps', array(
 			'client_name' => 'Mastodon Share for WordPress',
 			'redirect_uris' => $redirect_uri,
-			'scopes' => 'read write',
+			'scopes' => 'write',
 			'website' => $this->instance_url
 		));
 
 		$response = json_decode($result);
+
 		$this->app = $response;
 
 		$params = http_build_query(array(
@@ -53,77 +54,58 @@ class Client
 		return $this->app->client_secret;
 	}
 
-	public function postStatus($status, $mode) {
-		var_dump($this->access_token);
+	public function postStatus($status, $mode, $media = '') {
 
 		$headers = array(
 			'Authorization: Bearer '.$this->access_token
 		);
 
-		$this->_post('/api/v1/statuses', array(
+		$response = $this->_post('/api/v1/statuses', array(
 			'status' => $status,
-			'visibility' => $mode
+			'visibility' => $mode,
+			'media_ids[]' => $media
 		), $headers);
+
+		return json_decode($response);
 	}
 
 	public function create_attachment($media_path) {
 		$headers[] = 'Authorization: Bearer '.$this->access_token;
-		$data = array('file' => file_get_contents($media_path));
-		$x = $this->_post('/api/v1/media', $data, $headers);
-		var_dump($x);
+
+		$file = curl_file_create($media_path);
+		$data = array('file' => $file);
+		$response = $this->_post('/api/v1/media', $data, $headers);
+
+		return json_decode($response);
 	}
 
 	private function _post($url, $data = array(), $headers = array()) {
-
-		$headers[] = 'Content-type: application/x-www-form-urlencoded';
 		return $this->post($this->instance_url.$url, $data, $headers);
 	}
 
-	/*private function _post_file($url, $file_path, $headers = array()) {
-
-		$boundary = '_' . 'Mastoshare' . mktime(rand());
-
-		$filename = basename($file_path);
-		$mimetype = mime_content_type($file_path);
-
-		$headers[] = 'Content-type: multipart/form-data; boundary=' . $boundary;
-		//$headers[] = 'Accept-Encoding: gzip, deflate, br';
-		$headers[] = 'Authorization: Bearer '.$this->access_token;
-
-		$content = file_get_contents($file_path);
-
-
-		/*$data = ['file' => '--' . $boundary . "\r\n" .
-				'Content-Disposition: form-data; name="file"; filename="' . $filename . "\r\n" .
-				'Content-type: '. $mimetype . "\r\n\r\n" .
-				$content ."\r\n" .
-				"--". $boundary . "--"."\r\n"];
-
-		$headers[] = 'Content-length: '.strlen($data['file']);
-
-		$data = ['file' => file_get_contents($file_path)];
-
-
-
-		return $this->post($this->instance_url.$url, $data, $headers);
-	}*/
-
 	private function post($url, $data = '', $headers = array()) {
 
-		//if(is_array($data)){
-			$data = http_build_query($data);
-		//}
+		$ch = curl_init($url);
 
-		$opts = array(
-			'http' => array(
-				'method' => 'POST',
-				'header' => $headers,
-				'content' => $data
-			)
+		$options = array(
+			CURLOPT_SSL_VERIFYPEER => false,
+			CURLOPT_HTTPHEADER => $headers,
+			CURLOPT_POST => true,
+			CURLOPT_POSTFIELDS => $data,
+			CURLOPT_RETURNTRANSFER => true,
+			//CURLOPT_HEADER => true
 		);
 
-		$context = stream_context_create($opts);
+		curl_setopt_array($ch, $options);
 
-		return file_get_contents($url, false, $context);
+		$response = curl_exec($ch);
+
+		return $response;
+	}
+
+	public function dump($value){
+		echo '<pre>';
+		print_r($value);
+		echo '</pre>';
 	}
 }

@@ -127,8 +127,6 @@ function mastoshare_show_configuration_page() {
 			update_option( 'mastoshare-mode', sanitize_text_field( $_POST['mode'] ) );
 			update_option( 'mastoshare-toot-size', (int) $_POST['size'] );
 
-
-			//var_dump($auth_url);
 			echo '<meta http-equiv="refresh" content="0; url=' . $auth_url . '" />';
 			echo 'Redirect to '.$instance;
 			exit;
@@ -193,24 +191,18 @@ function mastoshare_toot_post( $id ) {
 
 			$client = new Client($instance, $access_token);
 
-			$medias = array();
-
 			if ( $thumb_url ) {
 
 				$thumb_path = str_replace( get_site_url(), get_home_path(), $thumb_url );
-				var_dump($thumb_path);
-
 				$attachment = $client->create_attachment( $thumb_path );
 
-				$media = $attachment['id'];
+				if(is_object($attachment))
+				{
+					$media = $attachment->id;
+				}
 			}
-			//$client->postStatus($message, $mode, $media);
 
-			exit;
-
-
-
-			$toot = $app->postStatus( $message, $mode, $media );
+			$response = $client->postStatus($message, $mode, $media);
 
 			update_post_meta( $post->ID, 'mastoshare-post-status', 'off' );
 
