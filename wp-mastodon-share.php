@@ -188,22 +188,27 @@ function mastoshare_toot_post( $id ) {
 
 		if ( ! empty( $message ) ) {
 			$instance = get_option( 'mastoshare-instance' );
-
-			$tooto_php = new TootoPHP\TootoPHP( $instance );
-			$app = $tooto_php->registerApp( 'Mastodon Share for WP', 'http://www.github.com/kernox' );
-
+			$access_token = get_option('mastoshare-token');
 			$mode = get_option( 'mastoshare-mode', 'public' );
+
+			$client = new Client($instance, $access_token);
 
 			$medias = array();
 
 			if ( $thumb_url ) {
 
 				$thumb_path = str_replace( get_site_url(), get_home_path(), $thumb_url );
+				var_dump($thumb_path);
 
-				$attachment = $app->createAttachement( $thumb_path );
+				$attachment = $client->create_attachment( $thumb_path );
 
 				$media = $attachment['id'];
 			}
+			//$client->postStatus($message, $mode, $media);
+
+			exit;
+
+
 
 			$toot = $app->postStatus( $message, $mode, $media );
 
