@@ -7,16 +7,14 @@ Tags: posts, mastodon, share
 Publish your posts on your Mastodon's instance.
 
 == Installation ==
-First you need to go to the configuration page "Mastodon Share".
-Set your Mastodon instance url and click on the "Obtain access key" button.
-In the new window opened, copy the code and paste it on the access key field.
-Define your message and your toot mode.
-Finally set the size of your future toots and save the configuration.
+Go to the configuration page, set your Mastodon instance url and other parameters.
+Click on button save.
+That's all ;)
 
 == Changelog ==
 
 = 1.0 =
-* Fix some bugs for IE & Firefox
+* Fix some bugs for IE and Firefox
 * Easier authenticate method
 
 = 0.9 =
