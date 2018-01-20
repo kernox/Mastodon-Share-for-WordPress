@@ -6,10 +6,11 @@ $(function(){
 
 	var template = $('#mastoshare_toot_template');
 	var toot = $('#mastoshare_toot');
-	var title = $('#title');
+
+	var _title = $('#title');
+	var _excerpt = $('#excerpt');
 
 	var tags =  $('#post_tag .tagchecklist span');
-	var excerpt = $('#excerpt');
 
 	var toot_limit_size = toot.attr('maxlength');
 	var toot_limit_size_span = $('#toot_limit_size');
@@ -17,16 +18,20 @@ $(function(){
 	var final_excerpt = '';
 	toot_limit_size_span.text(toot_limit_size);
 
-	function generate_toot() {
+	function generate_toot(reduce_of) {
+
+		if(reduce_of == undefined)
+			reduce_of = 0;
 
 		message = template.val();
 
-		var excerpt = get_excerpt();
+		var title = _title.val();
+		var excerpt = get_excerpt(reduce_of);
 		var permalink = get_permalink();
 		var hashtags = get_hashtags();
 
 		var metas = [
-			{name: 'title', value: title.val()},
+			{name: 'title', value: title},
 			{name: 'excerpt', value: excerpt},
 			{name: 'permalink', value: permalink},
 			{name: 'tags', value: hashtags}
@@ -35,6 +40,10 @@ $(function(){
 		for(var i in metas) {
 			var item = metas[i];
 			message = message.replace('[' + item.name + ']', item.value);
+		}
+
+		if(message.length > toot_limit_size){
+			generate_toot(reduce_of - 1);
 		}
 
 		toot_current_size_span.text(message.length);
@@ -55,18 +64,26 @@ $(function(){
 		return permalink;
 	}
 
-	function get_excerpt() {
+	function get_excerpt(reduce_of) {
 
 		var content = tinymce.editors.content.getContent({format : 'text'});
 
 		if(typenow != 'page'){
 
-			if(excerpt.val().length != 0) {
-				content = remove_html_tags(excerpt.val());
+			if(_excerpt.val().length != 0) {
+				content = remove_html_tags(_excerpt.val());
 			}
 		}
 
-		console.log(content);
+
+		if(reduce_of !==0)
+		{
+
+			content = content.split(/(\n|\s)/).slice(0,reduce_of);
+			var last_word = content[content.length-1];
+
+			content = content.join('').replace(/(\s|\n)+$/, '') + '...';
+		}
 
 		return content;
 	}
@@ -91,12 +108,12 @@ $(function(){
 	});
 
 	//Regenerate the toot when title changed
-	title.on('keyup', function() {
+	_title.on('keyup', function() {
 		generate_toot();
 	});
 
 	//Regenerate the toot when excerpt changed
-	excerpt.on('keyup', function() {
+	_excerpt.on('keyup', function() {
 		generate_toot();
 	});
 
