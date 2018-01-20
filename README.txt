@@ -15,6 +15,10 @@ Finally set the size of your future toots and save the configuration.
 
 == Changelog ==
 
+= 1.0 =
+* Fix some bugs for IE & Firefox
+* Easier authenticate method
+
 = 0.9 =
 * Fix permalink bug on toot editor
 
