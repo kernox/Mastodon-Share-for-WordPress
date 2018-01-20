@@ -15,7 +15,7 @@ class Client
 		$result = $this->_post('/api/v1/apps', array(
 			'client_name' => 'Mastodon Share for WordPress',
 			'redirect_uris' => $redirect_uri,
-			'scopes' => 'write',
+			'scopes' => 'read write',
 			'website' => $this->instance_url
 		));
 
@@ -25,7 +25,7 @@ class Client
 
 		$params = http_build_query(array(
 			'response_type' => 'code',
-			'scope' => 'write',
+			'scope' => 'read write',
 			'redirect_uri' => $redirect_uri,
 			'client_id' =>$this->app->client_id
 		));
