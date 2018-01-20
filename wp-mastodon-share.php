@@ -106,6 +106,8 @@ function mastoshare_configuration_page() {
  */
 function mastoshare_show_configuration_page() {
 
+	$token = get_option( 'mastoshare-token' );
+
 	if ( isset( $_POST['save'] ) ) {
 
 		$is_valid_nonce = wp_verify_nonce( $_POST['_wpnonce'], 'mastoshare-configuration' );
@@ -127,14 +129,24 @@ function mastoshare_show_configuration_page() {
 			update_option( 'mastoshare-mode', sanitize_text_field( $_POST['mode'] ) );
 			update_option( 'mastoshare-toot-size', (int) $_POST['size'] );
 
-			echo '<meta http-equiv="refresh" content="0; url=' . $auth_url . '" />';
-			echo 'Redirect to '.$instance;
-			exit;
+			$account = $client->verify_credentials($token);
+
+			if( isset( $account->error ) ){
+				echo '<meta http-equiv="refresh" content="0; url=' . $auth_url . '" />';
+				echo 'Redirect to '.$instance;
+				exit;
+			}
+
 		}
 	}
 
 	$instance = get_option( 'mastoshare-instance' );
-	$token = get_option( 'mastoshare-token' );
+
+	if( !empty( $token ) ) {
+		$client = new Client($instance);
+		$account = $client->verify_credentials($token);
+	}
+
 	$message = get_option( 'mastoshare-message', '[title] - [excerpt] - [permalink]' );
 	$mode = get_option( 'mastoshare-mode', 'public' );
 	$toot_size = get_option( 'mastoshare-toot-size', 500 );

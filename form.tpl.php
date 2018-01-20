@@ -19,6 +19,46 @@
 	.spacer{
 		margin: 20px 0;
 	}
+
+	.account{
+		border: 1px solid silver;
+		background-color: white;
+		padding: 15px;
+		float:left;
+
+	}
+
+	.m-avatar{
+		float:left;
+		border-radius: 100px;
+		margin-right: 20px;
+		width: 60px;
+	}
+	.separator{
+		clear:both;
+	}
+
+	.details{
+		float:left;
+	}
+
+	.details .link{
+		color:black;
+		text-decoration: none;
+	}
+
+	.connected{
+		color: #00AA00;
+		font-size: 16px;
+		margin-bottom: 10px;
+	}
+
+	.disconnected{
+		color: #FF0000;
+		font-size: 16px;
+		text-align: center;
+		width: 100%;
+	}
 </style>
 
 <div class="wrap">
@@ -31,15 +71,28 @@
 		</div>
 
 		<div class="block">
-			<label for="token"><?php esc_html_e( 'Access Key', 'wp-mastodon-share' ); ?></label>
-			<?php echo $token ?>
+			<label for="token"><?php esc_html_e( 'Status', 'wp-mastodon-share' ); ?></label>
+			<div class="account">
+				<a href="<?php echo $account->url ?>" target="_blank"><img class="m-avatar" src="<?php echo $account->avatar ?>"></a>
+				<div class="details">
+					<?php if(!$account->error): ?>
+						<div class="connected"><?php esc_html_e( 'Connected as', 'wp-mastodon-share' ); ?>&nbsp;<?php echo $account->username ?></div>
+						<a class="link" href="<?php echo $account->url ?>" target="_blank"><?php echo $account->url ?></a>
+					<?php else: ?>
+						<div class="disconnected"><?php esc_html_e( 'Disconnected', 'wp-mastodon-share' ); ?></div>
+					<?php endif ?>
+
+				</div>
+				<div class="separator"></div>
+			</div>
 		</div>
 
+		<div class="separator" style="margin-bottom:20px"></div>
 
 		<div class="block">
 			<label for="message"><?php esc_html_e( 'Message', 'wp-mastodon-share' ); ?></label>
 			<textarea  rows="10" cols="80" name="message" id="message"><?php esc_html_e( stripslashes( $message ) ); ?></textarea>
-			<p><i><?php esc_html_e( 'You can use these metas in the message', 'wp-mastodon-share' ); ?></i> : [title], [excerpt], [permalink] and [tags]</p>
+			<p><i><?php esc_html_e( 'You can use these metas in the message', 'wp-mastodon-share' ); ?></i> : [title], [excerpt], [permalink] <?php esc_html_e( 'and', 'wp-mastodon-share' ); ?> [tags]</p>
 		</div>
 
 		<div class="block">

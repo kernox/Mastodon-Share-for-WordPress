@@ -33,6 +33,17 @@ class Client
 		return $this->instance_url.'/oauth/authorize?'.$params;
 	}
 
+	public function verify_credentials($access_token){
+
+		$headers = array(
+			'Authorization: Bearer '.$access_token
+		);
+
+		$response = $this->_get('/api/v1/accounts/verify_credentials', null, $headers);
+
+		return $response;
+	}
+
 	public function get_bearer_token($client_id, $client_secret, $code, $redirect_uri) {
 
 		$response = $this->_post('/oauth/token',array(
@@ -83,7 +94,11 @@ class Client
 		return $this->post($this->instance_url.$url, $data, $headers);
 	}
 
-	private function post($url, $data = '', $headers = array()) {
+	public function _get($url, $data = array(), $headers = array()) {
+		return $this->get($this->instance_url.$url, $data, $headers);
+	}
+
+	private function post($url, $data = array(), $headers = array()) {
 
 		$ch = curl_init($url);
 
@@ -101,6 +116,23 @@ class Client
 		$response = curl_exec($ch);
 
 		return $response;
+	}
+
+	public function get($url, $data = array(), $headers = array()) {
+		$ch = curl_init($url);
+		$options = array(
+			CURLOPT_SSL_VERIFYPEER => false,
+			CURLOPT_HTTPHEADER => $headers,
+			CURLOPT_RETURNTRANSFER => true,
+			//CURLOPT_HEADER => true
+		);
+
+		curl_setopt_array($ch, $options);
+
+		$response = curl_exec($ch);
+
+		return json_decode($response);
+
 	}
 
 	public function dump($value){
