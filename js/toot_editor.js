@@ -17,20 +17,13 @@ $(function(){
 	var final_excerpt = '';
 	toot_limit_size_span.text(toot_limit_size);
 
-	function generate_toot(reduce_of = 0) {
+	function generate_toot() {
 
 		message = template.val();
 
 		var excerpt = get_excerpt();
 		var permalink = get_permalink();
 		var hashtags = get_hashtags();
-
-		//If toot reduce needed
-		if(reduce_of !== 0) {
-			var words = excerpt.split(' ');
-			words = words.slice(0, reduce_of);
-			excerpt = words.join(' ');
-		}
 
 		var metas = [
 			{name: 'title', value: title.val()},
@@ -39,26 +32,14 @@ $(function(){
 			{name: 'tags', value: hashtags}
 		];
 
-		for(i in metas) {
+		for(var i in metas) {
 			var item = metas[i];
 			message = message.replace('[' + item.name + ']', item.value);
 		}
 
-		//If message is too long
-		if (message.length > toot_limit_size) {
+		toot_current_size_span.text(message.length);
+		toot.val(message);
 
-			if(reduce_of == 0){
-				reduce_of = -1;
-			} else {
-				reduce_of = reduce_of -1;
-			}
-
-			generate_toot(reduce_of);
-
-		} else {
-			toot_current_size_span.text(message.length);
-			toot.val(message);
-		}
 	}
 
 	function get_permalink() {
@@ -81,9 +62,11 @@ $(function(){
 		if(typenow != 'page'){
 
 			if(excerpt.val().length != 0) {
-				return excerpt.val().replace(/<(?!\/?>)[^>]*>/gm, '');
+				content = remove_html_tags(excerpt.val());
 			}
 		}
+
+		console.log(content);
 
 		return content;
 	}
@@ -97,6 +80,10 @@ $(function(){
 		});
 
 		return hashtags.trim();
+	}
+
+	function remove_html_tags(string){
+		return string.replace(/<(?!\/?>)[^>]*>/gm, '');
 	}
 
 	toot.bind('input propertychange', function() {
@@ -124,7 +111,7 @@ $(function(){
 
 	var watcher = setInterval(function(){
 
-		if(tinymce.activeEditor){
+		if(tinymce.activeEditor) {
 
 			//Stop the watcher when activeEditor catched
 			clearInterval(watcher);
@@ -137,6 +124,6 @@ $(function(){
                 generate_toot();
 			});
 		}
-	},1000);
+	}, 1000);
 
 });

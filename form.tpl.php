@@ -92,7 +92,10 @@
 		<div class="block">
 			<label for="message"><?php esc_html_e( 'Message', 'wp-mastodon-share' ); ?></label>
 			<textarea  rows="10" cols="80" name="message" id="message"><?php esc_html_e( stripslashes( $message ) ); ?></textarea>
-			<p><i><?php esc_html_e( 'You can use these metas in the message', 'wp-mastodon-share' ); ?></i> : [title], [excerpt], [permalink] <?php esc_html_e( 'and', 'wp-mastodon-share' ); ?> [tags]</p>
+			<p>
+				<i><?php esc_html_e( 'You can use these metas in the message', 'wp-mastodon-share' ); ?></i>
+				: [title], [excerpt], [permalink] <?php esc_html_e( 'and', 'wp-mastodon-share' ); ?> [tags]
+			</p>
 		</div>
 
 		<div class="block">
