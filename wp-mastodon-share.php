@@ -4,7 +4,7 @@
  * Plugin Name: Mastodon Share
  * Plugin URI: https://github.com/kernox/mastoshare-wp
  * Description: Share WordPress posts on a mastodon instance.
- * Version: 1.0
+ * Version: 1.1
  * Author: Hellexis
  * Author URI: https://github.com/kernox
  * Text Domain: wp-mastodon-share
@@ -105,6 +105,12 @@ function mastoshare_configuration_page() {
  * @return void
  */
 function mastoshare_show_configuration_page() {
+
+	if( isset( $_GET['disconnect'] ) ) {
+		update_option( 'mastoshare-token' , '');
+	}
+
+
 
 	$token = get_option( 'mastoshare-token' );
 
@@ -214,19 +220,19 @@ function mastoshare_toot_post( $id ) {
 				}
 			}
 
-			$response = $client->postStatus($message, $mode, $media);
+			$toot = $client->postStatus($message, $mode, $media);
 
 			update_post_meta( $post->ID, 'mastoshare-post-status', 'off' );
 
 			add_action('admin_notices', 'mastoshare_notice_toot_success');
 
-			if ( isset( $toot['error'] ) ) {
+			if ( isset( $toot->error ) ) {
 				update_option(
 					'mastoshare-notice',
 					serialize(
 						array(
 							'message' => '<strong>Mastodon Share</strong> : ' . __( 'Sorry, can\'t send toot !', 'wp-mastodon-share' ) .
-							'<p><strong>' . __( 'Instance message', 'wp-mastodon-share' ) . '</strong> : ' . $toot['error'] . '</p>',
+							'<p><strong>' . __( 'Instance message', 'wp-mastodon-share' ) . '</strong> : ' . $toot->error . '</p>',
 							'class' => 'error',
 						)
 					)

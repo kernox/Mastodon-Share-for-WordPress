@@ -13,6 +13,9 @@ That's all ;)
 
 == Changelog ==
 
+= 1.1 ==
+* Add disconnect feature
+
 = 1.0 =
 * Fix some bugs for IE and Firefox
 * Easier authenticate method

@@ -75,9 +75,11 @@
 			<div class="account">
 				<a href="<?php echo $account->url ?>" target="_blank"><img class="m-avatar" src="<?php echo $account->avatar ?>"></a>
 				<div class="details">
-					<?php if(!$account->error): ?>
+					<?php if($account !== null): ?>
 						<div class="connected"><?php esc_html_e( 'Connected as', 'wp-mastodon-share' ); ?>&nbsp;<?php echo $account->username ?></div>
 						<a class="link" href="<?php echo $account->url ?>" target="_blank"><?php echo $account->url ?></a>
+
+						<p><a href="<?php echo $_SERVER['REQUEST_URI'] . '&disconnect' ?>" class="button">Disconnect</a></p>
 					<?php else: ?>
 						<div class="disconnected"><?php esc_html_e( 'Disconnected', 'wp-mastodon-share' ); ?></div>
 					<?php endif ?>
