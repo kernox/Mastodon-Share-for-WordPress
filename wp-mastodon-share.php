@@ -17,7 +17,7 @@ require_once 'client.php';
 add_action( 'admin_menu', 'mastoshare_configuration_page' );
 add_action( 'save_post', 'mastoshare_toot_post' );
 add_action( 'admin_notices', 'mastoshare_admin_notices' );
-add_action( 'post_submitbox_misc_actions', 'mastoshare_add_publish_meta_options' );
+
 add_action( 'plugins_loaded', 'mastoshare_init' );
 add_action( 'add_meta_boxes', 'mastoshare_add_metabox' );
 add_action( 'admin_enqueue_scripts', 'mastoshare_enqueue_scripts' );
@@ -114,8 +114,6 @@ function mastoshare_show_configuration_page() {
 		update_option( 'mastoshare-token' , '');
 	}
 
-
-
 	$token = get_option( 'mastoshare-token' );
 
 	if ( isset( $_POST['save'] ) ) {
@@ -162,24 +160,6 @@ function mastoshare_show_configuration_page() {
 	$toot_size = get_option( 'mastoshare-toot-size', 500 );
 
 	include 'form.tpl.php';
-}
-
-/**
- * Undocumented function
- *
- * @param WP_Post $post The post.
- * @return void
- */
-function mastoshare_add_publish_meta_options( $post ) {
-
-	$status = get_post_meta( $post->ID, 'mastoshare-post-status', true );
-
-	$checked = ( ! $status ) ? 'checked' : '';
-
-	echo '<div class="misc-pub-section misc-pub-section-last">' .
-	'<input ' . $checked . ' type="checkbox" name="toot_on_mastodon" id="toot_on_mastodon">' .
-	'<label for="toot_on_mastodon">' . __( 'Toot on Mastodon', 'wp-mastodon-share' ) . '</label>' .
-	'</div>';
 }
 
 /**
@@ -294,9 +274,17 @@ function mastoshare_metabox( $post ) {
 
 	$message = get_option( 'mastoshare-message' );
 
+
+	$status = get_post_meta( $post->ID, 'mastoshare-post-status', true );
+
+	$checked = ( ! $status ) ? 'checked' : '';
+
 	echo '<textarea id="mastoshare_toot" name="mastoshare_toot" maxlength="' . $toot_size . '" style="width:100%; min-height:320px; resize:none">Loading, please wait ...</textarea>'.
 	'<textarea id="mastoshare_toot_template" style="display:none">' . $message . '</textarea>' .
 	'<p>' . __( 'Chars', 'wp-mastodon-share' ) . ': <span id="toot_current_size">?</span> / <span id="toot_limit_size">?</span></p>';
+
+	echo '<div style="margin: 20px 0;"><input ' . $checked . ' type="checkbox" name="toot_on_mastodon" id="toot_on_mastodon">' .
+	'<label for="toot_on_mastodon">' . __( 'Toot on Mastodon', 'wp-mastodon-share' ) . '</label></div>';
 }
 
 function mastoshare_tinymce_before_init($init_array){
