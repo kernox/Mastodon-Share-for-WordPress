@@ -93,8 +93,6 @@ var toot_editor = {
 		var tags = document.querySelectorAll('#tagsdiv-post_tag .tagchecklist span.screen-reader-text');
 		var hashtags = '';
 
-		console.log(tags);
-
 		tags.forEach(function(item){
 			hashtags +='#' + item.innerText.split(':')[1].trim() + ' ';
 		});
@@ -108,20 +106,17 @@ var toot_editor = {
 
 		var that = this;
 
-		this.field.title.addEventListener('keyup', function(){
-			that.generate_toot();
-		});
+		var events = [
+			{element: this.field.title, action: 'keyup'},
+			{element: this.field.excerpt, action: 'keyup'},
+			{element: this.field.permalink, action: 'DOMSubtreeModified'},
+			{element: this.field.tags, action: 'DOMSubtreeModified'},
+		];
 
-		this.field.excerpt.addEventListener('keyup', function(){
-			that.generate_toot();
-		});
-
-		this.field.permalink.addEventListener('DOMSubtreeModified', function() {
-			that.generate_toot();
-		});
-
-		this.field.tags.addEventListener('DOMSubtreeModified', function() {
-			that.generate_toot();
-		});
+		for (var i in events){
+			events[i].element.addEventListener(events[i].action, function() {
+				that.generate_toot();
+			});
+		}
 	}
 };
