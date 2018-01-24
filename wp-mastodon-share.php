@@ -20,7 +20,9 @@ add_action( 'admin_notices', 'mastoshare_admin_notices' );
 add_action( 'post_submitbox_misc_actions', 'mastoshare_add_publish_meta_options' );
 add_action( 'plugins_loaded', 'mastoshare_init' );
 add_action( 'add_meta_boxes', 'mastoshare_add_metabox' );
-add_action( 'admin_enqueue_scripts', 'enqueue_scripts' );
+add_action( 'admin_enqueue_scripts', 'mastoshare_enqueue_scripts' );
+
+add_action('tiny_mce_before_init', 'mastoshare_tinymce_before_init');
 
 /**
  * Mastoshare_init
@@ -64,11 +66,11 @@ function mastoshare_init() {
 }
 
 /**
- * Enqueue_scripts
+ * Mastoshare_enqueue_scripts
  *
  * @return void
  */
-function enqueue_scripts() {
+function mastoshare_enqueue_scripts() {
 
 	global $pagenow;
 
@@ -105,6 +107,8 @@ function mastoshare_configuration_page() {
  * @return void
  */
 function mastoshare_show_configuration_page() {
+
+	wp_enqueue_style('mastoshare-configuration', plugin_dir_url(__FILE__).'style.css');
 
 	if( isset( $_GET['disconnect'] ) ) {
 		update_option( 'mastoshare-token' , '');
@@ -293,4 +297,9 @@ function mastoshare_metabox( $post ) {
 	echo '<textarea id="mastoshare_toot" name="mastoshare_toot" maxlength="' . $toot_size . '" style="width:100%; min-height:320px; resize:none">Loading, please wait ...</textarea>'.
 	'<textarea id="mastoshare_toot_template" style="display:none">' . $message . '</textarea>' .
 	'<p>' . __( 'Chars', 'wp-mastodon-share' ) . ': <span id="toot_current_size">?</span> / <span id="toot_limit_size">?</span></p>';
+}
+
+function mastoshare_tinymce_before_init($init_array){
+	$init_array['setup'] = file_get_contents(plugin_dir_path(__FILE__).'/js/tinymce_config.js');
+	return $init_array;
 }

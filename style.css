@@ -1,0 +1,51 @@
+.spacer{
+	margin-top: 20px;
+}
+
+.account{
+	border: 1px solid silver;
+	background-color: white;
+	padding: 15px;
+	float:left;
+
+}
+
+.m-avatar{
+	float:left;
+	border-radius: 100px;
+	margin-right: 20px;
+	width: 60px;
+}
+
+.details{
+	float:left;
+}
+
+.details .link{
+	color:black;
+	text-decoration: none;
+}
+
+.connected{
+	color: #00AA00;
+	font-size: 16px;
+	margin-bottom: 10px;
+}
+
+.disconnected{
+	color: #FF0000;
+	font-size: 16px;
+	text-align: center;
+	width: 100%;
+}
+
+.github-icon{
+	margin-right: 10px;
+	text-decoration: none;
+	position: relative;
+}
+
+html > body .liberapay-btn{
+	margin-top: 3px;
+    position: absolute;
+}
