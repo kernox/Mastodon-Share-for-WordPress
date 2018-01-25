@@ -13,6 +13,10 @@ That's all ;)
 
 == Changelog ==
 
+= 1.2 =
+* Add Scheduled post support
+* Memory optimization
+
 = 1.1 ==
 * Add disconnect feature
 
