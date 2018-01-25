@@ -357,12 +357,12 @@ class Mastoshare
 	public function tinymce_before_init($init_array){
 		$init_array['setup'] = file_get_contents(plugin_dir_path(__FILE__).'/js/tinymce_config.js');
 		return $init_array;
-	},
+	}
 
 	public function uninstall(){
-		delete_option('mastoshare-client-id');
-		delete_option('mastoshare-client-secret');
-		delete_option('mastoshare-token');
+		delete_option( 'mastoshare-client-id' );
+		delete_option( 'mastoshare-client-secret' );
+		delete_option( 'mastoshare-token' );
 		delete_option( 'mastoshare-instance' );
 		delete_option( 'mastoshare-message' );
 		delete_option( 'mastoshare-mode' );
