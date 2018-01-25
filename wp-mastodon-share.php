@@ -24,6 +24,7 @@ class Mastoshare
 		add_action( 'admin_notices', array($this, 'admin_notices' ) );
 		add_action( 'add_meta_boxes', array($this, 'add_metabox' ) );
 		add_action( 'tiny_mce_before_init', array($this, 'tinymce_before_init' ) );
+		add_action( 'publish_future_post', array($this, 'toot_scheduled_post') );
 	}
 
 	/**
@@ -184,58 +185,111 @@ class Mastoshare
 			$toot_on_mastodon_option = ( 'on' === $_POST['toot_on_mastodon'] );
 		}
 
-		if ( 'publish' === $post->post_status && $toot_on_mastodon_option ) {
+		if ( $toot_on_mastodon_option ) {
 
 			$message = stripslashes($_POST['mastoshare_toot']);
 
 			if ( ! empty( $message ) ) {
-				$instance = get_option( 'mastoshare-instance' );
-				$access_token = get_option('mastoshare-token');
-				$mode = get_option( 'mastoshare-mode', 'public' );
 
-				$client = new Client($instance, $access_token);
+				//Save the toot, for scheduling
+				if($post->post_status == 'future') {
+					update_post_meta($id, 'mastoshare-toot', $message);
 
-				if ( $thumb_url ) {
+					if ( $thumb_url ) {
 
-					$thumb_path = str_replace( get_site_url(), get_home_path(), $thumb_url );
-					$attachment = $client->create_attachment( $thumb_path );
-
-					if(is_object($attachment))
-					{
-						$media = $attachment->id;
+						$thumb_path = str_replace( get_site_url(), get_home_path(), $thumb_url );
+						update_post_meta($id, 'mastoshare-toot-thumbnail', $thumb_path);
 					}
-				}
 
-				$toot = $client->postStatus($message, $mode, $media);
-
-				update_post_meta( $post->ID, 'mastoshare-post-status', 'off' );
-
-				add_action('admin_notices', 'mastoshare_notice_toot_success');
-
-				if ( isset( $toot->error ) ) {
 					update_option(
 						'mastoshare-notice',
 						serialize(
 							array(
-								'message' => '<strong>Mastodon Share</strong> : ' . __( 'Sorry, can\'t send toot !', 'wp-mastodon-share' ) .
-								'<p><strong>' . __( 'Instance message', 'wp-mastodon-share' ) . '</strong> : ' . $toot->error . '</p>',
-								'class' => 'error',
+								'message' => '<strong>Mastodon Share</strong> : ' . __( 'Toot saved for schedule !', 'wp-mastodon-share' ),
+								'class' => 'info',
 							)
 						)
 					);
 				} else {
-					update_option(
-						'mastoshare-notice',
-						serialize(
-							array(
-								'message' => '<strong>Mastodon Share</strong> : ' . __( 'Toot successfully sent !', 'wp-mastodon-share' ),
-								'class' => 'success',
+					$instance = get_option( 'mastoshare-instance' );
+					$access_token = get_option('mastoshare-token');
+					$mode = get_option( 'mastoshare-mode', 'public' );
+
+					$client = new Client($instance, $access_token);
+
+					if ( $thumb_url ) {
+
+						$thumb_path = str_replace( get_site_url(), get_home_path(), $thumb_url );
+						$attachment = $client->create_attachment( $thumb_path );
+
+						if(is_object($attachment))
+						{
+							$media = $attachment->id;
+						}
+					}
+
+					$toot = $client->postStatus($message, $mode, $media);
+
+					update_post_meta( $id, 'mastoshare-post-status', 'off' );
+
+					add_action('admin_notices', 'mastoshare_notice_toot_success');
+
+					if ( isset( $toot->error ) ) {
+						update_option(
+							'mastoshare-notice',
+							serialize(
+								array(
+									'message' => '<strong>Mastodon Share</strong> : ' . __( 'Sorry, can\'t send toot !', 'wp-mastodon-share' ) .
+									'<p><strong>' . __( 'Instance message', 'wp-mastodon-share' ) . '</strong> : ' . $toot->error . '</p>',
+									'class' => 'error',
+								)
 							)
-						)
-					);
+						);
+					} else {
+						update_option(
+							'mastoshare-notice',
+							serialize(
+								array(
+									'message' => '<strong>Mastodon Share</strong> : ' . __( 'Toot successfully sent !', 'wp-mastodon-share' ),
+									'class' => 'success',
+								)
+							)
+						);
+					}
 				}
+
 			}
 		}
+	}
+
+	/**
+	 * Toot_scheduled_post
+	 * @param  integer $post_id
+	 */
+	public function toot_scheduled_post($post_id) {
+
+		$instance = get_option( 'mastoshare-instance' );
+		$access_token = get_option('mastoshare-token');
+		$mode = get_option( 'mastoshare-mode', 'public' );
+
+		$message = get_post_meta($post_id, 'mastoshare-toot', true);
+
+		$thumb_url = get_the_post_thumbnail_url($post_id);
+		$thumb_path = get_post_meta($post_id, 'mastoshare-toot-thumbnail', true);
+
+		$client = new Client($instance, $access_token);
+
+		if ( $thumb_url ) {
+
+			$attachment = $client->create_attachment( $thumb_path );
+
+			if(is_object($attachment))
+			{
+				$media = $attachment->id;
+			}
+		}
+
+		$toot = $client->postStatus($message, $mode, $media);
 	}
 
 	/**
