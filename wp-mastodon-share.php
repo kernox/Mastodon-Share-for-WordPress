@@ -25,8 +25,6 @@ class Mastoshare
 		add_action( 'add_meta_boxes', array($this, 'add_metabox' ) );
 		add_action( 'tiny_mce_before_init', array($this, 'tinymce_before_init' ) );
 		add_action( 'publish_future_post', array($this, 'toot_scheduled_post') );
-
-		register_uninstall_hook(__FILE__, array($this, 'uninstall'));
 	}
 
 	/**
@@ -357,17 +355,6 @@ class Mastoshare
 	public function tinymce_before_init($init_array){
 		$init_array['setup'] = file_get_contents(plugin_dir_path(__FILE__).'/js/tinymce_config.js');
 		return $init_array;
-	}
-
-	public function uninstall(){
-		delete_option( 'mastoshare-client-id' );
-		delete_option( 'mastoshare-client-secret' );
-		delete_option( 'mastoshare-token' );
-		delete_option( 'mastoshare-instance' );
-		delete_option( 'mastoshare-message' );
-		delete_option( 'mastoshare-mode' );
-		delete_option( 'mastoshare-toot-size' );
-		delete_option( 'mastoshare-notice' );
 	}
 }
 
