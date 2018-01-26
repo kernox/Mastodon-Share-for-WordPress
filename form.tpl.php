@@ -9,7 +9,8 @@
 						<label for="instance"><?php esc_html_e( 'Instance', 'wp-mastodon-share' ); ?></label>
 					</th>
 					<td>
-						<input type="text" id="instance" name="instance" size="80" value="<?php esc_attr_e( $instance ); ?>">
+						<input type="text" id="instance" name="instance" size="80" value="<?php esc_attr_e( $instance ); ?>" pattern="^http.+">
+						<p class="description"><?php esc_html_e('The instance url must be like http(s)://domain.tld', 'wp-mastodon-share') ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -41,7 +42,7 @@
 					<td>
 						<textarea  rows="10" cols="80" name="message" id="message"><?php esc_html_e( stripslashes( $message ) ); ?></textarea>
 						<p class="description"><i><?php esc_html_e( 'You can use these metas in the message', 'wp-mastodon-share' ); ?></i>
-							: [title], [excerpt], [permalink] <?php esc_html_e( 'and', 'wp-mastodon-share' ); ?> <a href="#" draggable="true">[tags]</a></p>
+							: [title], [excerpt], [permalink] <?php esc_html_e( 'and', 'wp-mastodon-share' ); ?> [tags]</p>
 					</td>
 				</tr>
 				<tr>
