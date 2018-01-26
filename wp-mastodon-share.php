@@ -160,7 +160,7 @@ class Mastoshare
 			$account = $client->verify_credentials($token);
 		}
 
-		$message = get_option( 'mastoshare-message', "[title]\n[excerpt]\n[permalink]" );
+		$message = get_option( 'mastoshare-message', "[title]\n\n[excerpt]\n\n[permalink]\n\n[tags]" );
 		$mode = get_option( 'mastoshare-mode', 'public' );
 		$toot_size = get_option( 'mastoshare-toot-size', 500 );
 
