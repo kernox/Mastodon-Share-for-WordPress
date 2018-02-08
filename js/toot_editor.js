@@ -5,6 +5,7 @@ var toot_editor = {
 	permalink: '',
 	hashtags: '',
 	message: '',
+	toot_limit_size: 0,
 
 	field: {
 		toot: document.getElementById('mastoshare_toot'),
@@ -21,6 +22,7 @@ var toot_editor = {
 	init: function(e) {
 
 		this.field.toot_limit_size.innerText = this.field.toot.attributes.maxlength.value;
+		this.toot_limit_size = this.field.toot.attributes.maxlength.value;
 		this.bind_events();
 		this.generate_toot();
 	},
@@ -48,7 +50,7 @@ var toot_editor = {
 			this.message = this.message.replace('[' + item.name + ']', item.value);
 		}
 
-		if(this.message.length > toot_limit_size){
+		if(this.message.length > this.toot_limit_size){
 			this.generate_toot(reduce_of - 1);
 		}
 
