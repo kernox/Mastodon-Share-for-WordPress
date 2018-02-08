@@ -125,5 +125,9 @@ var toot_editor = {
 		this.field.toot.addEventListener('keyup', function(){
 			that.update_chars_counter();
 		});
+
+		this.field.toot.addEventListener('onpaste', function(){
+			that.update_chars_counter();
+		});
 	}
 };
