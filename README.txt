@@ -13,6 +13,12 @@ That's all ;)
 
 == Changelog ==
 
+= 1.3 =
+* Fix deprecated javascripts
+* Fix toot auto truncation
+* Fix characters counter
+* Fix draft publish bug
+
 = 1.2 =
 * Add Scheduled post support
 * Memory optimization
