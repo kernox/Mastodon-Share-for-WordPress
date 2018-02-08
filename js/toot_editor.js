@@ -1,84 +1,76 @@
-var $ = jQuery;
+var toot_editor = {
 
-$(function(){
+	title: '',
+	excerpt: '',
+	permalink: '',
+	hashtags: '',
+	message: '',
+	toot_limit_size: 0,
 
-	var message = '';
+	field: {
+		toot: document.getElementById('mastoshare_toot'),
+		toot_current_size: document.getElementById('toot_current_size'),
+		toot_limit_size: document.getElementById('toot_limit_size'),
+		template: document.getElementById('mastoshare_toot_template'),
 
-	var template = $('#mastoshare_toot_template');
-	var toot = $('#mastoshare_toot');
+		title: document.getElementById('title'),
+		excerpt: document.getElementById('excerpt'),
+		permalink: document.getElementById('edit-slug-box'),
+		tags: document.querySelector('ul.tagchecklist')
+	},
 
-	var _title = $('#title');
-	var _excerpt = $('#excerpt');
+	init: function(e) {
 
-	var tags =  $('#post_tag .tagchecklist span');
-
-	var toot_limit_size = toot.attr('maxlength');
-	var toot_limit_size_span = $('#toot_limit_size');
-	var toot_current_size_span = $('#toot_current_size');
-	var final_excerpt = '';
-	toot_limit_size_span.text(toot_limit_size);
-
-	function generate_toot(reduce_of) {
+		this.field.toot_limit_size.innerText = this.field.toot.attributes.maxlength.value;
+		this.toot_limit_size = this.field.toot.attributes.maxlength.value;
+		this.bind_events();
+		this.generate_toot();
+	},
+	generate_toot: function(reduce_of) {
 
 		if(reduce_of == undefined)
 			reduce_of = 0;
 
-		message = template.val();
+		this.message = this.field.template.value;
 
-		var title = _title.val();
-		var excerpt = get_excerpt(reduce_of);
-		var permalink = get_permalink();
-		var hashtags = get_hashtags();
+		this.title = this.field.title.value;
+		this.excerpt = this.get_excerpt(reduce_of);
+		this.permalink = this.get_permalink();
+		this.hashtags = this.get_hashtags();
 
 		var metas = [
-			{name: 'title', value: title},
-			{name: 'excerpt', value: excerpt},
-			{name: 'permalink', value: permalink},
-			{name: 'tags', value: hashtags}
+			{name: 'title', value: this.title},
+			{name: 'excerpt', value: this.excerpt},
+			{name: 'permalink', value: this.permalink},
+			{name: 'tags', value: this.hashtags}
 		];
 
 		for(var i in metas) {
 			var item = metas[i];
-			message = message.replace('[' + item.name + ']', item.value);
+			this.message = this.message.replace('[' + item.name + ']', item.value);
 		}
 
-		if(message.length > toot_limit_size){
-			generate_toot(reduce_of - 1);
+		if(this.message.length > this.toot_limit_size){
+			this.generate_toot(reduce_of - 1);
 		}
 
-		toot_current_size_span.text(message.length);
-		toot.val(message);
+		this.field.toot.value = this.message;
+		this.update_chars_counter();
 
-	}
-
-	function get_permalink() {
-
-		var current_path = window.location.href;
-
-		var sample_permalink = $('#sample-permalink').text();
-		var editable_post_name =$('#editable-post-name').text();
-		var editable_post_name_full = $('#editable-post-name-full').text();
-
-		var permalink = sample_permalink.replace(editable_post_name, editable_post_name_full);
-
-		return permalink;
-	}
-
-	function get_excerpt(reduce_of) {
+	},
+	get_excerpt: function(reduce_of) {
 
 		var content = tinymce.editors.content.getContent({format : 'text'});
 
 		if(typenow != 'page'){
 
-			if(_excerpt.val().length != 0) {
-				content = remove_html_tags(_excerpt.val());
+			if(this.field.excerpt.value.length != 0) {
+				content = this.remove_html_tags(this.field.excerpt.value);
 			}
 		}
 
-
 		if(reduce_of !==0)
 		{
-
 			content = content.split(/(\n|\s)/).slice(0,reduce_of);
 			var last_word = content[content.length-1];
 
@@ -86,61 +78,65 @@ $(function(){
 		}
 
 		return content;
-	}
+	},
+	get_permalink: function() {
 
-	function get_hashtags() {
-		var tags = $('#tagsdiv-post_tag .tagchecklist span.screen-reader-text');
+		var current_path = window.location.href;
+
+		var sample_permalink = document.getElementById('sample-permalink').innerText;
+		var editable_post_name =document.getElementById('editable-post-name').innerText;
+		var editable_post_name_full = document.getElementById('editable-post-name-full').innerText;
+
+		var permalink = sample_permalink.replace(editable_post_name, editable_post_name_full);
+
+		return permalink;
+	},
+	get_hashtags: function() {
+		var tags = document.querySelectorAll('#tagsdiv-post_tag .tagchecklist span.screen-reader-text');
 		var hashtags = '';
 
-		tags.each(function(index, item){
-			hashtags+='#' + $(item).text().split(':')[1].trim() + ' ';
+		tags.forEach(function(item){
+			hashtags +='#' + item.innerText.split(':')[1].trim() + ' ';
 		});
 
 		return hashtags.trim();
-	}
-
-	function remove_html_tags(string){
+	},
+	update_chars_counter: function(){
+		this.field.toot_current_size.innerText = this.field.toot.value.length;
+	},
+	remove_html_tags: function(string) {
 		return string.replace(/<(?!\/?>)[^>]*>/gm, '');
-	}
+	},
+	bind_events: function() {
 
-	toot.bind('input propertychange', function() {
-		toot_current_size_span.text(toot.val().length);
-	});
+		var that = this;
 
-	//Regenerate the toot when title changed
-	_title.on('keyup', function() {
-		generate_toot();
-	});
+		var observer = new MutationObserver(function(mutationsList){
+			that.generate_toot();
+		});
 
-	//Regenerate the toot when excerpt changed
-	_excerpt.on('keyup', function() {
-		generate_toot();
-	});
+		observer.observe(this.field.permalink, {attributes: true, childList: true});
 
-	//Regenerate the toot when tags changed
-	$('ul.tagchecklist').on('DOMSubtreeModified', function() {
-		generate_toot();
-	});
+		this.field.title.addEventListener('keyup', function() {
+			that.generate_toot();
+		});
 
-	$('#edit-slug-box').on('DOMSubtreeModified', function() {
-		generate_toot();
-	});
+		this.field.toot.addEventListener('keyup', function() {
+			that.update_chars_counter();
+		});
 
-	var watcher = setInterval(function(){
+		this.field.toot.addEventListener('onpaste', function() {
+			that.update_chars_counter();
+		});
 
-		if(tinymce.activeEditor) {
+		if(typenow == 'post') {
 
-			//Stop the watcher when activeEditor catched
-			clearInterval(watcher);
+			observer.observe(this.field.tags, {attributes: true, childList: true});
 
-			//First generation of the toot
-			generate_toot();
-
-			//Regenerate the toot when content changed
-			tinymce.activeEditor.on('keyup', function(){
-                generate_toot();
+			this.field.excerpt.addEventListener('keyup', function() {
+				that.generate_toot();
 			});
-		}
-	}, 1000);
 
-});
+		}
+	}
+};
