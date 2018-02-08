@@ -111,37 +111,32 @@ var toot_editor = {
 
 		var that = this;
 
-		if(typenow == 'post'){
+		var observer = new MutationObserver(function(mutationsList){
+			that.generate_toot();
+		});
 
-			var events = [
-				{element: this.field.title, action: 'keyup'},
-				{element: this.field.excerpt, action: 'keyup'},
-				{element: this.field.permalink, action: 'DOMSubtreeModified'},
-				{element: this.field.tags, action: 'DOMSubtreeModified'},
-			];
+		observer.observe(this.field.permalink, {attributes: true, childList: true});
 
-		} else {
-			var events = [
-				{element: this.field.title, action: 'keyup'},
-				{element: this.field.permalink, action: 'DOMSubtreeModified'},
-			];
-		}
+		this.field.title.addEventListener('keyup', function() {
+			that.generate_toot();
+		});
 
-		if(events.length != 0)
-		{
-			for (var i in events){
-				events[i].element.addEventListener(events[i].action, function() {
-					that.generate_toot();
-				});
-			}
+		this.field.toot.addEventListener('keyup', function() {
+			that.update_chars_counter();
+		});
 
-			this.field.toot.addEventListener('keyup', function(){
-				that.update_chars_counter();
+		this.field.toot.addEventListener('onpaste', function() {
+			that.update_chars_counter();
+		});
+
+		if(typenow == 'post') {
+
+			observer.observe(this.field.tags, {attributes: true, childList: true});
+
+			this.field.excerpt.addEventListener('keyup', function() {
+				that.generate_toot();
 			});
 
-			this.field.toot.addEventListener('onpaste', function(){
-				that.update_chars_counter();
-			});			
 		}
 	}
 };
