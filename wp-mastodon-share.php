@@ -177,6 +177,7 @@ class Mastoshare
 	public function toot_post( $id ) {
 
 		$post = get_post( $id );
+
 		$thumb_url = get_the_post_thumbnail_url($id);
 
 		$toot_size = (int) get_option( 'mastoshare-toot-size', 500 );
@@ -212,7 +213,7 @@ class Mastoshare
 							)
 						)
 					);
-				} else {
+				} else if($post->post_status !== 'draft') {
 					$instance = get_option( 'mastoshare-instance' );
 					$access_token = get_option('mastoshare-token');
 					$mode = get_option( 'mastoshare-mode', 'public' );

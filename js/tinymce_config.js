@@ -5,7 +5,6 @@ function(ed){
 	})
 
 	ed.on('keyup', function(e){
-		console.log('keyup');
 		toot_editor.generate_toot();
 	})	
 }
