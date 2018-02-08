@@ -52,8 +52,8 @@ var toot_editor = {
 			this.generate_toot(reduce_of - 1);
 		}
 
-		this.field.toot_current_size.innerText = this.message.length;
 		this.field.toot.value = this.message;
+		this.update_chars_counter();
 
 	},
 	get_excerpt: function(reduce_of) {
@@ -99,6 +99,9 @@ var toot_editor = {
 
 		return hashtags.trim();
 	},
+	update_chars_counter: function(){
+		this.field.toot_current_size.innerText = this.field.toot.value.length;
+	},
 	remove_html_tags: function(string) {
 		return string.replace(/<(?!\/?>)[^>]*>/gm, '');
 	},
@@ -118,5 +121,9 @@ var toot_editor = {
 				that.generate_toot();
 			});
 		}
+
+		this.field.toot.addEventListener('keyup', function(){
+			that.update_chars_counter();
+		});
 	}
 };
