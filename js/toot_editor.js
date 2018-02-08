@@ -109,25 +109,37 @@ var toot_editor = {
 
 		var that = this;
 
-		var events = [
-			{element: this.field.title, action: 'keyup'},
-			{element: this.field.excerpt, action: 'keyup'},
-			{element: this.field.permalink, action: 'DOMSubtreeModified'},
-			{element: this.field.tags, action: 'DOMSubtreeModified'},
-		];
+		if(typenow == 'post'){
 
-		for (var i in events){
-			events[i].element.addEventListener(events[i].action, function() {
-				that.generate_toot();
-			});
+			var events = [
+				{element: this.field.title, action: 'keyup'},
+				{element: this.field.excerpt, action: 'keyup'},
+				{element: this.field.permalink, action: 'DOMSubtreeModified'},
+				{element: this.field.tags, action: 'DOMSubtreeModified'},
+			];
+
+		} else {
+			var events = [
+				{element: this.field.title, action: 'keyup'},
+				{element: this.field.permalink, action: 'DOMSubtreeModified'},
+			];
 		}
 
-		this.field.toot.addEventListener('keyup', function(){
-			that.update_chars_counter();
-		});
+		if(events.length != 0)
+		{
+			for (var i in events){
+				events[i].element.addEventListener(events[i].action, function() {
+					that.generate_toot();
+				});
+			}
 
-		this.field.toot.addEventListener('onpaste', function(){
-			that.update_chars_counter();
-		});
+			this.field.toot.addEventListener('keyup', function(){
+				that.update_chars_counter();
+			});
+
+			this.field.toot.addEventListener('onpaste', function(){
+				that.update_chars_counter();
+			});			
+		}
 	}
 };
