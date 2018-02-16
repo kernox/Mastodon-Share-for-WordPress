@@ -51,10 +51,27 @@ class Mastoshare
 				$instance = get_option( 'mastoshare-instance' );
 				$client = new Client($instance);
 				$token = $client->get_bearer_token($client_id, $client_secret, $code, get_admin_url());
-
-				update_option('mastoshare-client-id', '');
-				update_option('mastoshare-client-secret', '');
-				update_option('mastoshare-token', $token->access_token);
+				
+				if(isset($token->error)){
+					print_r($token);
+					//TODO: Propper error message 
+					update_option(
+						'mastoshare-notice',
+						serialize(
+							array(
+								'message' => '<strong>Mastodon Share</strong> : ' . __( "Can't log you in.", 'wp-mastodon-share' ) .
+									'<p><strong>' . __( 'Instance message', 'wp-mastodon-share' ) . '</strong> : ' . $token->error_description . '</p>',
+									'class' => 'error',
+								)
+							)
+						);
+						unset($token);
+						update_option('mastoshare-token', '');
+				}else{
+					update_option('mastoshare-client-id', '');
+					update_option('mastoshare-client-secret', '');
+					update_option('mastoshare-token', $token->access_token);
+				}
 				$redirect_url = get_admin_url().'options-general.php?page=wp-mastodon-share';
 			}
 			else
