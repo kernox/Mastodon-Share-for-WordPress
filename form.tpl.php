@@ -1,42 +1,47 @@
+<?php define("ACCOUNT_CONNECTED",isset($account) && $account !== null);?>
+
 <div class="wrap">
 	<h1><?php esc_html_e( 'Mastodon Share Configuration', 'wp-mastodon-share' ); ?></h1>
 	<form method="POST">
 		<?php wp_nonce_field( 'mastoshare-configuration' ); ?>
 		<table class="form-table">
 			<tbody>
-				<tr>
+				<tr style="display:<?=!ACCOUNT_CONNECTED ? "block":"none"?>">
 					<th scope="row">
 						<label for="instance"><?php esc_html_e( 'Instance', 'wp-mastodon-share' ); ?></label>
 					</th>
 					<td>
 						<input type="text" id="instance" name="instance" size="80" value="<?php esc_attr_e( $instance ); ?>" list="mInstances">
 					</td>
+					<td>
+						<input class="button button-primary" type="submit" value="<?php esc_attr_e( 'Connect to Mastodon', 'wp-mastodon-share' ); ?>" name="save" id="save">
+					</td>
 				</tr>
-				<tr>
+				<tr style="display:<?=ACCOUNT_CONNECTED ? "block" : "none"?>">
 					<th scope="row">
 						<label><?php esc_html_e( 'Status', 'wp-mastodon-share' ); ?></label>
 					</th>
 					<td>
 						<div class="account">
-							<?php if(isset($account) && $account !== null): ?>
+						<?php if(ACCOUNT_CONNECTED): ?>
 								<a href="<?php echo $account->url ?>" target="_blank"><img class="m-avatar" src="<?php echo $account->avatar ?>"></a>
-							<?php endif ?>
+						<?php endif ?>
 							<div class="details">
-								<?php if(isset($account) && $account !== null): ?>
+								<?php if(ACCOUNT_CONNECTED): ?>
 									<div class="connected"><?php esc_html_e( 'Connected as', 'wp-mastodon-share' ); ?>&nbsp;<?php echo $account->username ?></div>
 									<a class="link" href="<?php echo $account->url ?>" target="_blank"><?php echo $account->url ?></a>
 
-									<p><a href="<?php echo $_SERVER['REQUEST_URI'] . '&disconnect' ?>" class="button"><?php esc_html_e( 'Disconnect', 'wp-mastodon-share' ); ?></a></p>
+									<p><a href="<?php echo $_SERVER['REQUEST_URI'] . '&disconnect' ?>" class="button"><?php esc_html_e( 'Disconnect', 'wp-mastodon-share' ); ?></a>
+									<a href="<?php echo $_SERVER['REQUEST_URI'] . '&testToot' ?>" class="button"><?php esc_html_e( 'Send test toot', 'wp-mastodon-share' ); ?></a></p>
 								<?php else: ?>
 									<div class="disconnected"><?php esc_html_e( 'Disconnected', 'wp-mastodon-share' ); ?></div>
 								<?php endif ?>
-
 							</div>
 							<div class="separator"></div>
 						</div>
 					</td>
 				</tr>
-				<tr>
+				<tr style="display:<?=ACCOUNT_CONNECTED ? "block" : "none"?>">
 					<th scope="row">
 						<label for="message"><?php esc_html_e( 'Message', 'wp-mastodon-share' ); ?></label>
 					</th>
@@ -46,7 +51,7 @@
 							: [title], [excerpt], [permalink] <?php esc_html_e( 'and', 'wp-mastodon-share' ); ?> [tags]</p>
 					</td>
 				</tr>
-				<tr>
+				<tr style="display:<?=ACCOUNT_CONNECTED ? "block" : "none"?>">
 					<th scope="row">
 						<label for="mode"><?php esc_html_e( 'Toot mode', 'wp-mastodon-share' ); ?></label>
 					</th>
@@ -59,7 +64,7 @@
 						</select>
 					</td>
 				</tr>
-				<tr>
+				<tr style="display:<?=ACCOUNT_CONNECTED ? "block" : "none"?>">
 					<th scope="row">
 						<label for="size"><?php esc_html_e( 'Toot size', 'wp-mastodon-share' ); ?></label>
 					</th>
@@ -70,10 +75,8 @@
 			</tbody>
 		</table>
 
-		<?php if(isset($account) && $account !== null): ?>
+		<?php if(ACCOUNT_CONNECTED): ?>
 			<input class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save configuration', 'wp-mastodon-share' ); ?>" name="save" id="save">
-		<?php else: ?>
-			<input class="button button-primary" type="submit" value="<?php esc_attr_e( 'Connect to Mastodon', 'wp-mastodon-share' ); ?>" name="save" id="save">
 		<?php endif ?>
 
 	</form>
