@@ -12,14 +12,13 @@ class Client
 
 	public function register_app($redirect_uri) {
 
-		$result = $this->_post('/api/v1/apps', array(
+		$response = $this->_post('/api/v1/apps', array(
 			'client_name' => 'Mastodon Share for WordPress',
 			'redirect_uris' => $redirect_uri,
 			'scopes' => 'read write',
 			'website' => $this->instance_url
 		));
 
-		$response = json_decode($result);
 
 		$this->app = $response;
 
@@ -36,7 +35,7 @@ class Client
 	public function verify_credentials($access_token){
 
 		$headers = array(
-			'Authorization: Bearer '.$access_token
+			'Authorization'=>'Bearer '.$access_token
 		);
 
 		$response = $this->_get('/api/v1/accounts/verify_credentials', null, $headers);
@@ -54,7 +53,7 @@ class Client
 			'code' => $code
 		));
 
-		return json_decode($response);
+		return $response;
 	}
 
 	public function get_client_id() {
@@ -68,7 +67,7 @@ class Client
 	public function postStatus($status, $mode, $media = '') {
 
 		$headers = array(
-			'Authorization: Bearer '.$this->access_token
+			'Authorization'=> 'Bearer '.$this->access_token
 		);
 
 		$response = $this->_post('/api/v1/statuses', array(
@@ -77,17 +76,19 @@ class Client
 			'media_ids[]' => $media
 		), $headers);
 
-		return json_decode($response);
+		return $response;
 	}
 
 	public function create_attachment($media_path) {
-		$headers[] = 'Authorization: Bearer '.$this->access_token;
+		$headers = array (
+			'Authorization'=> 'Bearer '.$this->access_token
+		);
 
 		$file = curl_file_create($media_path);
 		$data = array('file' => $file);
 		$response = $this->_post('/api/v1/media', $data, $headers);
 
-		return json_decode($response);
+		return $response;
 	}
 
 	private function _post($url, $data = array(), $headers = array()) {
@@ -99,40 +100,28 @@ class Client
 	}
 
 	private function post($url, $data = array(), $headers = array()) {
-
-		$ch = curl_init($url);
-
-		$options = array(
-			CURLOPT_SSL_VERIFYPEER => false,
-			CURLOPT_HTTPHEADER => $headers,
-			CURLOPT_POST => true,
-			CURLOPT_POSTFIELDS => $data,
-			CURLOPT_RETURNTRANSFER => true,
-			//CURLOPT_HEADER => true
+		$args = array(
+		    'headers' => $headers,
+		    'body'=>$data,
+		    'redirection' => 5
 		);
 
-		curl_setopt_array($ch, $options);
-
-		$response = curl_exec($ch);
-
-		return $response;
+		$response = wp_remote_post( $this->getValidURL($url), $args );
+		$responseBody = wp_remote_retrieve_body($response);	
+		
+		return json_decode($responseBody);
 	}
 
 	public function get($url, $data = array(), $headers = array()) {
-		$ch = curl_init($url);
-		$options = array(
-			CURLOPT_SSL_VERIFYPEER => false,
-			CURLOPT_HTTPHEADER => $headers,
-			CURLOPT_RETURNTRANSFER => true,
-			//CURLOPT_HEADER => true
+		$args = array(
+		    'headers' => $headers,
+		    'redirection' => 5
 		);
 
-		curl_setopt_array($ch, $options);
-
-		$response = curl_exec($ch);
-
-		return json_decode($response);
-
+		$response = wp_remote_get( $this->getValidURL($url), $args );
+		$responseBody = wp_remote_retrieve_body($response);	
+		
+		return json_decode($responseBody);
 	}
 
 	public function dump($value){
