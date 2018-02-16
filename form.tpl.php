@@ -9,8 +9,7 @@
 						<label for="instance"><?php esc_html_e( 'Instance', 'wp-mastodon-share' ); ?></label>
 					</th>
 					<td>
-						<input type="text" id="instance" name="instance" size="80" value="<?php esc_attr_e( $instance ); ?>" pattern="^http.+">
-						<p class="description"><?php esc_html_e('The instance url must be like http(s)://domain.tld', 'wp-mastodon-share') ?></p>
+						<input type="text" id="instance" name="instance" size="80" value="<?php esc_attr_e( $instance ); ?>" list="mInstances">
 					</td>
 				</tr>
 				<tr>
@@ -85,5 +84,7 @@
 
 	<script class="liberapay" src="https://liberapay.com/hellexis/widgets/button.js"></script>
 	<noscript><a href="https://liberapay.com/hellexis/donate"><img src="https://liberapay.com/assets/widgets/donate.svg"></a></noscript>
-
+<?php
+	require("instanceList.php")
+?>
 </div>
