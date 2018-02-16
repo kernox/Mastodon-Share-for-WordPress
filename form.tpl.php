@@ -71,7 +71,7 @@
 			</tbody>
 		</table>
 
-		<?php if($account !== null): ?>
+		<?php if(isset($account) && $account !== null): ?>
 			<input class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save configuration', 'wp-mastodon-share' ); ?>" name="save" id="save">
 		<?php else: ?>
 			<input class="button button-primary" type="submit" value="<?php esc_attr_e( 'Connect to Mastodon', 'wp-mastodon-share' ); ?>" name="save" id="save">
