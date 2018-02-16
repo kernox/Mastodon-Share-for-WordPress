@@ -19,7 +19,11 @@
 					</th>
 					<td>
 						<div class="account">
-							<a href="<?php echo $account->url ?>" target="_blank"><img class="m-avatar" src="<?php echo $account->avatar ?>"></a>
+							<?php if($account !== null): ?>
+								<a href="<?php echo $account->url ?>" target="_blank"><img class="m-avatar" src="<?php echo $account->avatar ?>"></a>
+							<?php else:?>
+								???Please first log in???
+							<?php endif ?>
 							<div class="details">
 								<?php if($account !== null): ?>
 									<div class="connected"><?php esc_html_e( 'Connected as', 'wp-mastodon-share' ); ?>&nbsp;<?php echo $account->username ?></div>
