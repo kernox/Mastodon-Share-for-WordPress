@@ -405,7 +405,7 @@ class Mastoshare
 				'mastoshare-notice',
 				serialize(
 					array(
-						'message' => '<strong>Mastodon Share</strong> : ' . __( 'Toot successfully sent !', 'wp-mastodon-share' ). ' <a href="TODO:TOOTURL" target="_blank">'. __('View Toot', 'wp-mastodon-share') .'</a>',
+						'message' => '<strong>Mastodon Share</strong> : ' . __( 'Toot successfully sent !', 'wp-mastodon-share' ). ' <a href="'.$toot->url.'" target="_blank">'. __('View Toot', 'wp-mastodon-share') .'</a>',
 						'class' => 'success',
 					)
 				)
