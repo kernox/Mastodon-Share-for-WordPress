@@ -140,4 +140,14 @@ class Client
 		print_r($value);
 		echo '</pre>';
 	}
+
+	private function getValidURL($url){
+		 if  ( $ret = parse_url($url) ) {
+ 			if ( !isset($ret["scheme"]) ){
+				$url = "http://{$url}";
+			}
+		}
+		return $url;
+
+	}
 }
