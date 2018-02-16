@@ -19,9 +19,11 @@
 					</th>
 					<td>
 						<div class="account">
-							<a href="<?php echo $account->url ?>" target="_blank"><img class="m-avatar" src="<?php echo $account->avatar ?>"></a>
+							<?php if(isset($account) && $account !== null): ?>
+								<a href="<?php echo $account->url ?>" target="_blank"><img class="m-avatar" src="<?php echo $account->avatar ?>"></a>
+							<?php endif ?>
 							<div class="details">
-								<?php if($account !== null): ?>
+								<?php if(isset($account) && $account !== null): ?>
 									<div class="connected"><?php esc_html_e( 'Connected as', 'wp-mastodon-share' ); ?>&nbsp;<?php echo $account->username ?></div>
 									<a class="link" href="<?php echo $account->url ?>" target="_blank"><?php echo $account->url ?></a>
 
@@ -69,7 +71,7 @@
 			</tbody>
 		</table>
 
-		<?php if($account !== null): ?>
+		<?php if(isset($account) && $account !== null): ?>
 			<input class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save configuration', 'wp-mastodon-share' ); ?>" name="save" id="save">
 		<?php else: ?>
 			<input class="button button-primary" type="submit" value="<?php esc_attr_e( 'Connect to Mastodon', 'wp-mastodon-share' ); ?>" name="save" id="save">
