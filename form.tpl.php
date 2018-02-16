@@ -56,12 +56,10 @@
 						<label for="mode"><?php esc_html_e( 'Toot mode', 'wp-mastodon-share' ); ?></label>
 					</th>
 					<td>
-						<select name="mode" id="mode">
-							<option <?php if ( 'public' === $mode ): ?>selected<?php endif; ?> value="public"><?php esc_html_e( 'Public', 'wp-mastodon-share' ); ?></option>
-							<option <?php if ( 'unlisted' === $mode ): ?>selected<?php endif; ?> value="unlisted"><?php esc_html_e( 'Unlisted', 'wp-mastodon-share' ); ?></option>
-							<option <?php if ( 'private' === $mode ): ?>selected<?php endif; ?> value="private"><?php esc_html_e( 'Private', 'wp-mastodon-share' ); ?></option>
-							<option <?php if ( 'direct' === $mode ): ?>selected<?php endif; ?> value="direct"><?php esc_html_e( 'Direct', 'wp-mastodon-share' ); ?></option>
-						</select>
+							<label><input type="radio" name="mode" <?php if ( 'public' === $mode ): ?>checked<?php endif; ?> value="public"><?php esc_html_e( 'Public', 'wp-mastodon-share' ); ?></label>
+							<label><input type="radio" name="mode" <?php if ( 'unlisted' === $mode ): ?>checked<?php endif; ?> value="unlisted"><?php esc_html_e( 'Unlisted', 'wp-mastodon-share' ); ?></label>
+							<label><input type="radio" name="mode" <?php if ( 'private' === $mode ): ?>checked<?php endif; ?> value="private"><?php esc_html_e( 'Private', 'wp-mastodon-share' ); ?></label>
+							<label><input type="radio" name="mode" <?php if ( 'direct' === $mode ): ?>checked<?php endif; ?> value="direct"><?php esc_html_e( 'Direct', 'wp-mastodon-share' ); ?></label>
 					</td>
 				</tr>
 				<tr style="display:<?=ACCOUNT_CONNECTED ? "block" : "none"?>">
