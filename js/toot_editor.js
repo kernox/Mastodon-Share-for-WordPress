@@ -81,15 +81,27 @@ var toot_editor = {
 	},
 	get_permalink: function() {
 
-		var current_path = window.location.href;
+		var sample_permalink_field = document.getElementById('sample-permalink');
+		var editable_post_name_field =document.getElementById('editable-post-name');
+		var editable_post_name_full_field = document.getElementById('editable-post-name-full');
 
-		var sample_permalink = document.getElementById('sample-permalink').innerText;
-		var editable_post_name =document.getElementById('editable-post-name').innerText;
-		var editable_post_name_full = document.getElementById('editable-post-name-full').innerText;
+		if(sample_permalink_field !== null)
+			var sample_permalink = sample_permalink_field.innerText;
 
-		var permalink = sample_permalink.replace(editable_post_name, editable_post_name_full);
+		if(editable_post_name_field != null)
+			var editable_post_name = editable_post_name_field.innerText;
 
-		return permalink;
+		if(editable_post_name_full_field != null)
+			var editable_post_name_full = editable_post_name_full_field.innerText;
+
+		if(sample_permalink != undefined && editable_post_name != undefined && editable_post_name_full != undefined) {
+			var permalink = sample_permalink.replace(editable_post_name, editable_post_name_full);
+			return permalink;
+		} else {
+			//New post/page case
+			return "";
+		}
+
 	},
 	get_hashtags: function() {
 		var tags = document.querySelectorAll('#tagsdiv-post_tag .tagchecklist span.screen-reader-text');
