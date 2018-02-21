@@ -1,7 +1,8 @@
 === Mastodon Share ===
-Tested up to: 4.9.2
+Tested up to: 4.9.4
 Donate link: https://liberapay.com/hellexis/donate
-Tags: posts, mastodon, share
+Contributors: L1am0
+Tags: posts, mastodon, share, schedule
 
 == Description ==
 Publish your posts on your Mastodon's instance.
