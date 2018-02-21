@@ -169,6 +169,20 @@ class Mastoshare
 					exit;
 				}
 
+				//Inform user that save was successfull
+				update_option(
+					'mastoshare-notice',
+					serialize(
+						array(
+						'message' => '<strong>Mastodon Share</strong> : ' . __( 'Configuration successfully saved !', 'wp-mastodon-share' ),
+						'class' => 'success',
+						)
+					)
+				);
+		
+				$this->admin_notices();
+	
+
 			}
 		}
 
