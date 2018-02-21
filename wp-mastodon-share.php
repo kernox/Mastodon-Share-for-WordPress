@@ -51,10 +51,27 @@ class Mastoshare
 				$instance = get_option( 'mastoshare-instance' );
 				$client = new Client($instance);
 				$token = $client->get_bearer_token($client_id, $client_secret, $code, get_admin_url());
-
-				update_option('mastoshare-client-id', '');
-				update_option('mastoshare-client-secret', '');
-				update_option('mastoshare-token', $token->access_token);
+				
+				if(isset($token->error)){
+					print_r($token);
+					//TODO: Propper error message 
+					update_option(
+						'mastoshare-notice',
+						serialize(
+							array(
+								'message' => '<strong>Mastodon Share</strong> : ' . __( "Can't log you in.", 'wp-mastodon-share' ) .
+									'<p><strong>' . __( 'Instance message', 'wp-mastodon-share' ) . '</strong> : ' . $token->error_description . '</p>',
+									'class' => 'error',
+								)
+							)
+						);
+						unset($token);
+						update_option('mastoshare-token', '');
+				}else{
+					update_option('mastoshare-client-id', '');
+					update_option('mastoshare-client-secret', '');
+					update_option('mastoshare-token', $token->access_token);
+				}
 				$redirect_url = get_admin_url().'options-general.php?page=wp-mastodon-share';
 			}
 			else
@@ -117,6 +134,8 @@ class Mastoshare
 
 		if( isset( $_GET['disconnect'] ) ) {
 			update_option( 'mastoshare-token' , '');
+		}elseif( isset( $_GET['testToot'] ) ) {
+			$this->sendTestToot();
 		}
 
 		$token = get_option( 'mastoshare-token' );
@@ -236,7 +255,6 @@ class Mastoshare
 					update_post_meta( $id, 'mastoshare-post-status', 'off' );
 
 					add_action('admin_notices', 'mastoshare_notice_toot_success');
-
 					if ( isset( $toot->error ) ) {
 						update_option(
 							'mastoshare-notice',
@@ -253,11 +271,13 @@ class Mastoshare
 							'mastoshare-notice',
 							serialize(
 								array(
-									'message' => '<strong>Mastodon Share</strong> : ' . __( 'Toot successfully sent !', 'wp-mastodon-share' ),
+									'message' => '<strong>Mastodon Share</strong> : ' . __( 'Toot successfully sent !', 'wp-mastodon-share' ). ' <a href="'.$toot->url.'" target="_blank">'. __('View Toot', 'wp-mastodon-share') .'</a>',
 									'class' => 'success',
 								)
 							)
 						);
+						//Save the toot url for syndication
+						update_post_meta($id, 'mastoshareshare-lastSuccessfullTootURL',$toot->url);
 					}
 				}
 
@@ -356,6 +376,42 @@ class Mastoshare
 	public function tinymce_before_init($init_array){
 		$init_array['setup'] = file_get_contents(plugin_dir_path(__FILE__).'/js/tinymce_config.js');
 		return $init_array;
+	}
+
+	private function sendTestToot(){
+		$instance = get_option( 'mastoshare-instance' );
+		$access_token = get_option('mastoshare-token');
+		$mode = get_option( 'mastoshare-mode', 'public' );
+
+		$client = new Client($instance, $access_token);
+		//TODO: Add propper message
+		$message=__("This is my first post with mastodon auto share",'wp-mastodon-share');
+		$media=null;
+		$toot = $client->postStatus($message, $mode, $media);
+		
+		if ( isset( $toot->error ) ) {
+			update_option(
+				'mastoshare-notice',
+				serialize(
+					array(
+						'message' => '<strong>Mastodon Share</strong> : ' . __( 'Sorry, can\'t send toot !', 'wp-mastodon-share' ) .
+						'<p><strong>' . __( 'Instance message', 'wp-mastodon-share' ) . '</strong> : ' . $toot->error . '</p>',
+						'class' => 'error',
+					)
+				)
+			);
+		} else {
+			update_option(
+				'mastoshare-notice',
+				serialize(
+					array(
+						'message' => '<strong>Mastodon Share</strong> : ' . __( 'Toot successfully sent !', 'wp-mastodon-share' ). ' <a href="'.$toot->url.'" target="_blank">'. __('View Toot', 'wp-mastodon-share') .'</a>',
+						'class' => 'success',
+					)
+				)
+			);
+		}
+		$this->admin_notices();
 	}
 }
 
