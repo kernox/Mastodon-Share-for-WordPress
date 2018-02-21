@@ -6,5 +6,5 @@ function(ed){
 
 	ed.on('keyup', function(e){
 		toot_editor.generate_toot();
-	})	
+	})
 }

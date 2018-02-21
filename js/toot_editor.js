@@ -54,7 +54,7 @@ var toot_editor = {
 			this.generate_toot(reduce_of - 1);
 		}
 
-		this.field.toot.value = this.message;
+		this.field.toot.value = this.message.trim();
 		this.update_chars_counter();
 
 	},
