@@ -1,11 +1,10 @@
 .wrap{
-	background-color:#282c37;
 	padding:10px;	
 	border-radius:10px;
 	min-height:100%;
 }
 .wrap h1, .wrap label, .wrap form  p{
-	color: #d9e1e8;
+	color: #000;
 }
 
 .wrap .button{
@@ -16,9 +15,15 @@
 	font-weight:bold;
 	background-color:#FFF !important;
 }
+
+.wrap .button:hover{
+	background-color:transparent;
+}
+
 .wrap input, .wrap textarea{
 	background-color:transparent !important;
-	color:#d9e1e8 !important;
+	color:#000 !important;
+	border-color:#000;
 	border-radius:4px;
 }
 .spacer{
@@ -26,7 +31,7 @@
 }
 
 .account{
-	border: 1px solid #d9e1e8;
+	border: 1px solid #000;
 	padding: 15px;
 	border-radius:4px;
 	float:left;
@@ -45,7 +50,7 @@
 }
 
 .details .link{
-	color:#d9e1e8;
+	color:#000;
 	text-decoration: none;
 }
 
