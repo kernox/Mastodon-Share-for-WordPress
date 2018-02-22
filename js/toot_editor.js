@@ -16,7 +16,8 @@ var toot_editor = {
 		title: document.getElementById('title'),
 		excerpt: document.getElementById('excerpt'),
 		permalink: document.getElementById('edit-slug-box'),
-		tags: document.querySelector('ul.tagchecklist')
+		tags: document.querySelector('ul.tagchecklist'),
+		cw_content: document.getElementById('cw_content')
 	},
 
 	init: function(e) {
@@ -50,12 +51,22 @@ var toot_editor = {
 			this.message = this.message.replace('[' + item.name + ']', item.value);
 		}
 
-		if(this.message.length > this.toot_limit_size){
-			this.generate_toot(reduce_of - 1);
+		var cw_text_size = this.field.cw_content.value.length;
+		if( cw_text_size > 0) {
+			var new_limit_size = this.field.toot.attributes.maxlength.value - cw_text_size;
+			this.field.toot_limit_size.innerText = new_limit_size;
+			this.toot_limit_size = new_limit_size;
+		} else {
+			this.field.toot_limit_size.innerText = this.field.toot.attributes.maxlength.value;
 		}
 
-		this.field.toot.value = this.message.trim();
-		this.update_chars_counter();
+		if(this.message.length > this.toot_limit_size) {
+			this.generate_toot(reduce_of - 1);
+		} else {
+			this.field.toot.value = this.message.trim();
+			this.update_chars_counter();
+		}
+
 
 	},
 	get_excerpt: function(reduce_of) {
@@ -71,6 +82,7 @@ var toot_editor = {
 
 		if(reduce_of !==0)
 		{
+			content = content.substr(0, this.toot_limit_size);
 			content = content.split(/(\n|\s)/).slice(0,reduce_of);
 			var last_word = content[content.length-1];
 
@@ -139,6 +151,14 @@ var toot_editor = {
 
 		this.field.toot.addEventListener('onpaste', function() {
 			that.update_chars_counter();
+		});
+
+		this.field.cw_content.addEventListener('keyup', function(){
+			that.generate_toot();
+		});
+
+		this.field.cw_content.addEventListener('onpaste', function(){
+			that.generate_toot();
 		});
 
 		if(typenow == 'post') {

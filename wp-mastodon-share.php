@@ -51,10 +51,10 @@ class Mastoshare
 				$instance = get_option( 'mastoshare-instance' );
 				$client = new Client($instance);
 				$token = $client->get_bearer_token($client_id, $client_secret, $code, get_admin_url());
-				
+
 				if(isset($token->error)){
 					print_r($token);
-					//TODO: Propper error message 
+					//TODO: Propper error message
 					update_option(
 						'mastoshare-notice',
 						serialize(
@@ -179,9 +179,9 @@ class Mastoshare
 						)
 					)
 				);
-		
+
 				$this->admin_notices();
-	
+
 
 			}
 		}
@@ -216,6 +216,7 @@ class Mastoshare
 		$toot_size = (int) get_option( 'mastoshare-toot-size', 500 );
 
 		$toot_on_mastodon_option = false;
+		$cw_content = $_POST['cw_content'];
 
 		if( isset( $_POST['toot_on_mastodon'] ) ) {
 			$toot_on_mastodon_option = ( 'on' === $_POST['toot_on_mastodon'] );
@@ -264,7 +265,7 @@ class Mastoshare
 						}
 					}
 
-					$toot = $client->postStatus($message, $mode, $media);
+					$toot = $client->postStatus($message, $mode, $media, $cw_content);
 
 					update_post_meta( $id, 'mastoshare-post-status', 'off' );
 
@@ -373,7 +374,7 @@ class Mastoshare
 		$toot_size = (int) get_option( 'mastoshare-toot-size', 500 );
 
 		$message = get_option( 'mastoshare-message' );
-
+		$cw_content = get_option('mastoshare-cw-content');
 
 		$status = get_post_meta( $post->ID, 'mastoshare-post-status', true );
 
@@ -383,8 +384,13 @@ class Mastoshare
 		'<textarea id="mastoshare_toot_template" style="display:none">' . $message . '</textarea>' .
 		'<p>' . __( 'Chars', 'wp-mastodon-share' ) . ': <span id="toot_current_size">?</span> / <span id="toot_limit_size">?</span></p>';
 
+		echo '<div style="margin: 20px 0;"><label for="cw_content">'.__('Content Warning Text', 'wp-mastodon-share').'</label>'.
+		'<input id="cw_content" name="cw_content" style="width: 100%;" type="text" value="' . $cw_content . '">'
+		.'</div>';
+
 		echo '<div style="margin: 20px 0;"><input ' . $checked . ' type="checkbox" name="toot_on_mastodon" id="toot_on_mastodon">' .
 		'<label for="toot_on_mastodon">' . __( 'Toot on Mastodon', 'wp-mastodon-share' ) . '</label></div>';
+
 	}
 
 	public function tinymce_before_init($init_array){
@@ -402,7 +408,7 @@ class Mastoshare
 		$message=__("This is my first post with mastodon auto share",'wp-mastodon-share');
 		$media=null;
 		$toot = $client->postStatus($message, $mode, $media);
-		
+
 		if ( isset( $toot->error ) ) {
 			update_option(
 				'mastoshare-notice',

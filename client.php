@@ -64,7 +64,7 @@ class Client
 		return $this->app->client_secret;
 	}
 
-	public function postStatus($status, $mode, $media = '') {
+	public function postStatus($status, $mode, $media = '', $spoiler_text = '') {
 
 		$headers = array(
 			'Authorization'=> 'Bearer '.$this->access_token
@@ -73,6 +73,7 @@ class Client
 		$response = $this->_post('/api/v1/statuses', array(
 			'status' => $status,
 			'visibility' => $mode,
+			'spoiler_text' => $spoiler_text,
 			'media_ids[]' => $media
 		), $headers);
 
@@ -107,8 +108,8 @@ class Client
 		);
 
 		$response = wp_remote_post( $this->getValidURL($url), $args );
-		$responseBody = wp_remote_retrieve_body($response);	
-		
+		$responseBody = wp_remote_retrieve_body($response);
+
 		return json_decode($responseBody);
 	}
 
@@ -119,8 +120,8 @@ class Client
 		);
 
 		$response = wp_remote_get( $this->getValidURL($url), $args );
-		$responseBody = wp_remote_retrieve_body($response);	
-		
+		$responseBody = wp_remote_retrieve_body($response);
+
 		return json_decode($responseBody);
 	}
 
