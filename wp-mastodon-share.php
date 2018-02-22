@@ -59,7 +59,7 @@ class Mastoshare
 						'mastoshare-notice',
 						serialize(
 							array(
-								'message' => '<strong>Mastodon Share</strong> : ' . __( "Can't log you in.", 'wp-mastodon-share' ) .
+								'message' => '<strong>Mastodon Auto Share</strong> : ' . __( "Can't log you in.", 'wp-mastodon-share' ) .
 									'<p><strong>' . __( 'Instance message', 'wp-mastodon-share' ) . '</strong> : ' . $token->error_description . '</p>',
 									'class' => 'error',
 								)
@@ -112,8 +112,8 @@ class Mastoshare
 	 */
 	public function configuration_page() {
 		add_options_page(
-			'Mastodon Share',
-			'Mastodon Share',
+			'Mastodon Auto Share',
+			'Mastodon Auto Share',
 			'install_plugins',
 			'wp-mastodon-share',
 			array($this, 'show_configuration_page')
@@ -177,7 +177,7 @@ class Mastoshare
 					'mastoshare-notice',
 					serialize(
 						array(
-						'message' => '<strong>Mastodon Share</strong> : ' . __( 'Configuration successfully saved !', 'wp-mastodon-share' ),
+						'message' => '<strong>Mastodon Auto Share</strong> : ' . __( 'Configuration successfully saved !', 'wp-mastodon-share' ),
 						'class' => 'success',
 						)
 					)
@@ -246,7 +246,7 @@ class Mastoshare
 						'mastoshare-notice',
 						serialize(
 							array(
-								'message' => '<strong>Mastodon Share</strong> : ' . __( 'Toot saved for schedule !', 'wp-mastodon-share' ),
+								'message' => '<strong>Mastodon Auto Share</strong> : ' . __( 'Toot saved for schedule !', 'wp-mastodon-share' ),
 								'class' => 'info',
 							)
 						)
@@ -280,7 +280,7 @@ class Mastoshare
 							'mastoshare-notice',
 							serialize(
 								array(
-									'message' => '<strong>Mastodon Share</strong> : ' . __( 'Sorry, can\'t send toot !', 'wp-mastodon-share' ) .
+									'message' => '<strong>Mastodon Auto Share</strong> : ' . __( 'Sorry, can\'t send toot !', 'wp-mastodon-share' ) .
 									'<p><strong>' . __( 'Instance message', 'wp-mastodon-share' ) . '</strong> : ' . $toot->error . '</p>',
 									'class' => 'error',
 								)
@@ -291,7 +291,7 @@ class Mastoshare
 							'mastoshare-notice',
 							serialize(
 								array(
-									'message' => '<strong>Mastodon Share</strong> : ' . __( 'Toot successfully sent !', 'wp-mastodon-share' ). ' <a href="'.$toot->url.'" target="_blank">'. __('View Toot', 'wp-mastodon-share') .'</a>',
+									'message' => '<strong>Mastodon Auto Share</strong> : ' . __( 'Toot successfully sent !', 'wp-mastodon-share' ). ' <a href="'.$toot->url.'" target="_blank">'. __('View Toot', 'wp-mastodon-share') .'</a>',
 									'class' => 'success',
 								)
 							)
@@ -419,7 +419,7 @@ class Mastoshare
 				'mastoshare-notice',
 				serialize(
 					array(
-						'message' => '<strong>Mastodon Share</strong> : ' . __( 'Sorry, can\'t send toot !', 'wp-mastodon-share' ) .
+						'message' => '<strong>Mastodon Auto Share</strong> : ' . __( 'Sorry, can\'t send toot !', 'wp-mastodon-share' ) .
 						'<p><strong>' . __( 'Instance message', 'wp-mastodon-share' ) . '</strong> : ' . $toot->error . '</p>',
 						'class' => 'error',
 					)
@@ -430,7 +430,7 @@ class Mastoshare
 				'mastoshare-notice',
 				serialize(
 					array(
-						'message' => '<strong>Mastodon Share</strong> : ' . __( 'Toot successfully sent !', 'wp-mastodon-share' ). ' <a href="'.$toot->url.'" target="_blank">'. __('View Toot', 'wp-mastodon-share') .'</a>',
+						'message' => '<strong>Mastodon Auto Share</strong> : ' . __( 'Toot successfully sent !', 'wp-mastodon-share' ). ' <a href="'.$toot->url.'" target="_blank">'. __('View Toot', 'wp-mastodon-share') .'</a>',
 						'class' => 'success',
 					)
 				)
