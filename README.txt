@@ -1,7 +1,7 @@
-=== Mastodon Share ===
+=== Mastodon Auto Share ===
 Tested up to: 4.9.4
-Donate link: https://liberapay.com/hellexis/donate
-Contributors: L1am0
+Donate link: https://liberapay.com/Mastodon-Auto-Share-Team/donate
+Contributors: Hellexis, L1am0
 Tags: posts, mastodon, share, schedule
 
 == Description ==

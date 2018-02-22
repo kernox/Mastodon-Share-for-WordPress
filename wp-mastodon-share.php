@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin Name: Mastodon Share
+ * Plugin Name: Mastodon Auto Share
  * Plugin URI: https://github.com/kernox/mastoshare-wp
  * Description: Share WordPress posts on a mastodon instance.
  * Version: 1.3
