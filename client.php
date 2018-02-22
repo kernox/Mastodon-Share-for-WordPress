@@ -81,12 +81,25 @@ class Client
 	}
 
 	public function create_attachment($media_path) {
+
+		$filename =basename($media_path);
+		$mime_type = mime_content_type($media_path);
+
+		$boundary ='hlx'.time();
+
 		$headers = array (
-			'Authorization'=> 'Bearer '.$this->access_token
+			'Authorization'=> 'Bearer '.$this->access_token,
+			'Content-Type' => 'multipart/form-data; boundary='. $boundary,
 		);
 
-		$file = curl_file_create($media_path);
-		$data = array('file' => $file);
+		$nl = "\r\n";
+
+		$data = '--'.$boundary.$nl;
+		$data .= 'Content-Disposition: form-data; name="file"; filename="'.$filename.'"'.$nl;
+		$data .= 'Content-Type: '. $mime_type .$nl.$nl;
+		$data .= file_get_contents($media_path) .$nl;
+		$data .= '--'.$boundary.'--';
+
 		$response = $this->_post('/api/v1/media', $data, $headers);
 
 		return $response;
@@ -103,7 +116,7 @@ class Client
 	private function post($url, $data = array(), $headers = array()) {
 		$args = array(
 		    'headers' => $headers,
-		    'body'=>$data,
+		    'body'=> $data,
 		    'redirection' => 5
 		);
 

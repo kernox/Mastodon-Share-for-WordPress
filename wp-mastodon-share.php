@@ -211,7 +211,7 @@ class Mastoshare
 
 		$post = get_post( $id );
 
-		$thumb_url = get_the_post_thumbnail_url($id);
+		$thumb_url = get_the_post_thumbnail_url($id, 'medium_large'); //Don't change the resolution !
 
 		$toot_size = (int) get_option( 'mastoshare-toot-size', 500 );
 
@@ -255,6 +255,7 @@ class Mastoshare
 					$client = new Client($instance, $access_token);
 
 					if ( $thumb_url ) {
+
 
 						$thumb_path = str_replace( get_site_url(), get_home_path(), $thumb_url );
 						$attachment = $client->create_attachment( $thumb_path );
