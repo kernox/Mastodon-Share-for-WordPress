@@ -6,7 +6,7 @@
 		<?php wp_nonce_field( 'mastoshare-configuration' ); ?>
 		<table class="form-table">
 			<tbody>
-				<tr style="display:<?=!ACCOUNT_CONNECTED ? "block":"none"?>">
+				<tr style="display:<?php echo !ACCOUNT_CONNECTED ? "block":"none"?>">
 					<th scope="row">
 						<label for="instance"><?php esc_html_e( 'Instance', 'wp-mastodon-share' ); ?></label>
 					</th>
@@ -17,7 +17,7 @@
 						<input class="button button-primary" type="submit" value="<?php esc_attr_e( 'Connect to Mastodon', 'wp-mastodon-share' ); ?>" name="save" id="save">
 					</td>
 				</tr>
-				<tr style="display:<?=ACCOUNT_CONNECTED ? "block" : "none"?>">
+				<tr style="display:<?php echo ACCOUNT_CONNECTED ? "block" : "none"?>">
 					<th scope="row">
 						<label><?php esc_html_e( 'Status', 'wp-mastodon-share' ); ?></label>
 					</th>
@@ -41,7 +41,15 @@
 						</div>
 					</td>
 				</tr>
-				<tr style="display:<?=ACCOUNT_CONNECTED ? "block" : "none"?>">
+				<tr style="display:<?php echo ACCOUNT_CONNECTED ? "block" : "none"?>">
+					<th scope="row">
+						<label for="content_warning"><?php esc_html_e( 'Default Content Warning', 'wp-mastodon-share' ); ?></label>
+					</th>
+					<td>
+						<input type="text" id="content_warning" name="content_warning" style="width:300px" value="<?php esc_attr_e( $content_warning ); ?>">
+					</td>
+				</tr>
+				<tr style="display:<?php echo ACCOUNT_CONNECTED ? "block" : "none"?>">
 					<th scope="row">
 						<label for="message"><?php esc_html_e( 'Message', 'wp-mastodon-share' ); ?></label>
 					</th>
@@ -51,7 +59,7 @@
 							: [title], [excerpt], [permalink] <?php esc_html_e( 'and', 'wp-mastodon-share' ); ?> [tags]</p>
 					</td>
 				</tr>
-				<tr style="display:<?=ACCOUNT_CONNECTED ? "block" : "none"?>">
+				<tr style="display:<?php echo ACCOUNT_CONNECTED ? "block" : "none"?>">
 					<th scope="row">
 						<label for="mode"><?php esc_html_e( 'Toot mode', 'wp-mastodon-share' ); ?></label>
 					</th>
@@ -62,7 +70,7 @@
 							<label><input type="radio" name="mode" <?php if ( 'direct' === $mode ): ?>checked<?php endif; ?> value="direct"><?php esc_html_e( 'Direct', 'wp-mastodon-share' ); ?></label>
 					</td>
 				</tr>
-				<tr style="display:<?=ACCOUNT_CONNECTED ? "block" : "none"?>">
+				<tr style="display:<?php echo ACCOUNT_CONNECTED ? "block" : "none"?>">
 					<th scope="row">
 						<label for="size"><?php esc_html_e( 'Toot size', 'wp-mastodon-share' ); ?></label>
 					</th>

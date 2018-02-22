@@ -147,6 +147,7 @@ class Mastoshare
 			if ( $is_valid_nonce ) {
 				$instance = esc_url( $_POST['instance'] );
 				$message = stripslashes($_POST['message']);
+				$content_warning = $_POST['content_warning'];
 
 				$client = new Client($instance);
 				$redirect_url = get_admin_url();
@@ -160,6 +161,8 @@ class Mastoshare
 				update_option( 'mastoshare-message', sanitize_textarea_field( $message ) );
 				update_option( 'mastoshare-mode', sanitize_text_field( $_POST['mode'] ) );
 				update_option( 'mastoshare-toot-size', (int) $_POST['size'] );
+
+				update_option( 'mastoshare-content-warning', sanitize_textarea_field( $content_warning ) );
 
 				$account = $client->verify_credentials($token);
 
@@ -196,6 +199,7 @@ class Mastoshare
 		$message = get_option( 'mastoshare-message', "[title]\n\n[excerpt]\n\n[permalink]\n\n[tags]" );
 		$mode = get_option( 'mastoshare-mode', 'public' );
 		$toot_size = get_option( 'mastoshare-toot-size', 500 );
+		$content_warning = get_option( 'mastoshare-content-warning', '');
 
 		include 'form.tpl.php';
 	}
@@ -375,7 +379,7 @@ class Mastoshare
 		$toot_size = (int) get_option( 'mastoshare-toot-size', 500 );
 
 		$message = get_option( 'mastoshare-message' );
-		$cw_content = get_option('mastoshare-cw-content');
+		$cw_content = get_option('mastoshare-content-warning');
 
 		$status = get_post_meta( $post->ID, 'mastoshare-post-status', true );
 
