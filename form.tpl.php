@@ -1,4 +1,7 @@
-<?php define("ACCOUNT_CONNECTED",isset($account) && $account !== null);?>
+<?php 
+define("ACCOUNT_CONNECTED",isset($account) && $account !== null);
+define("ADVANCED_VIEW",false);
+?>
 
 <div class="wrap">
 	<h1><?php esc_html_e( 'Mastodon Auto Share Configuration', 'wp-mastodon-share' ); ?></h1>
@@ -41,7 +44,7 @@
 						</div>
 					</td>
 				</tr>
-				<tr style="display:<?php echo ACCOUNT_CONNECTED ? "block" : "none"?>">
+				<tr class="advanced_setting">
 					<th scope="row">
 						<label for="content_warning"><?php esc_html_e( 'Default Content Warning', 'wp-mastodon-share' ); ?></label>
 					</th>
@@ -53,10 +56,15 @@
 					<th scope="row">
 						<label for="message"><?php esc_html_e( 'Message', 'wp-mastodon-share' ); ?></label>
 					</th>
-					<td>
+					<td class="advanced_setting">
 						<textarea  rows="10" cols="80" name="message" id="message"><?php esc_html_e( stripslashes( $message ) ); ?></textarea>
 						<p class="description"><i><?php esc_html_e( 'You can use these metas in the message', 'wp-mastodon-share' ); ?></i>
 							: [title], [excerpt], [permalink] <?php esc_html_e( 'and', 'wp-mastodon-share' ); ?> [tags]</p>
+					</td>
+					<td class="not_advanced_setting messageRadioButtons">
+							<label><b>title</b><br><a href="">permalink</a><br><input type="radio" name="message_template" value="[title]&#10;[permalink]"></label>
+							<label><b>title</b><br><a href="">permalink</a><br>#tags #tags<br><input type="radio" name="message_template" value="[title]&#10;[permalink]&#10;[tags]"></label>
+							<label><b>title</b><br><i>excerpt excerpt excerpt excerpt...</i><br><a href="">permalink</a><br>#tags #tags<br><input type="radio" name="message_template" value="[title]&#10;[excerpt]&#10;[permalink]&#10;[tags]"></label>
 					</td>
 				</tr>
 				<tr style="display:<?php echo ACCOUNT_CONNECTED ? "block" : "none"?>">
@@ -64,13 +72,13 @@
 						<label for="mode"><?php esc_html_e( 'Toot mode', 'wp-mastodon-share' ); ?></label>
 					</th>
 					<td>
-							<label><input type="radio" name="mode" <?php if ( 'public' === $mode ): ?>checked<?php endif; ?> value="public"><?php esc_html_e( 'Public', 'wp-mastodon-share' ); ?></label>
-							<label><input type="radio" name="mode" <?php if ( 'unlisted' === $mode ): ?>checked<?php endif; ?> value="unlisted"><?php esc_html_e( 'Unlisted', 'wp-mastodon-share' ); ?></label>
-							<label><input type="radio" name="mode" <?php if ( 'private' === $mode ): ?>checked<?php endif; ?> value="private"><?php esc_html_e( 'Private', 'wp-mastodon-share' ); ?></label>
-							<label><input type="radio" name="mode" <?php if ( 'direct' === $mode ): ?>checked<?php endif; ?> value="direct"><?php esc_html_e( 'Direct', 'wp-mastodon-share' ); ?></label>
+							<label><input type="radio" name="mode" <?php if ( 'public' === $mode ): ?>checked<?php endif; ?> value="public"><img src="<?php echo plugins_url( 'img/post/public.svg', __FILE__ );?>" class="modeIcon"> <?php esc_html_e( 'Public', 'wp-mastodon-share' ); ?></label>
+							<label><input type="radio" name="mode" <?php if ( 'unlisted' === $mode ): ?>checked<?php endif; ?> value="unlisted"><img src="<?php echo plugins_url( 'img/post/unlisted.svg', __FILE__ );?>" class="modeIcon"> <?php esc_html_e( 'Unlisted', 'wp-mastodon-share' ); ?></label>
+							<label><input type="radio" name="mode" <?php if ( 'private' === $mode ): ?>checked<?php endif; ?> value="private"><img src="<?php echo plugins_url( 'img/post/private.svg', __FILE__ );?>" class="modeIcon"> <?php esc_html_e( 'Private', 'wp-mastodon-share' ); ?></label>
+							<label><input type="radio" name="mode" <?php if ( 'direct' === $mode ): ?>checked<?php endif; ?> value="direct"><img src="<?php echo plugins_url( 'img/post/direct.svg', __FILE__ );?>" class="modeIcon"> <?php esc_html_e( 'Direct', 'wp-mastodon-share' ); ?></label>
 					</td>
 				</tr>
-				<tr style="display:<?php echo ACCOUNT_CONNECTED ? "block" : "none"?>">
+				<tr class="advanced_setting">
 					<th scope="row">
 						<label for="size"><?php esc_html_e( 'Toot size', 'wp-mastodon-share' ); ?></label>
 					</th>
@@ -83,6 +91,7 @@
 
 		<?php if(ACCOUNT_CONNECTED): ?>
 			<input class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save configuration', 'wp-mastodon-share' ); ?>" name="save" id="save">
+			<input class="button button-primary" value="<?php esc_attr_e( 'Advanced configuration', 'wp-mastodon-share' ); ?>" id="show_advanced_configuration">
 		<?php endif ?>
 
 	</form>
