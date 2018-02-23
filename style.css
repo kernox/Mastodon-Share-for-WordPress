@@ -139,12 +139,17 @@
 label{
 	display:inline-block;
 	vertical-align: bottom;
+	opacity:0.5;
 	text-align:center;
 }
 
 .messageRadioButtons label{
 	padding:10px;
 	border:dashed 2px #000;
+}
+
+input[type="radio"]{
+	display:none;	
 }
 
 .github-icon{

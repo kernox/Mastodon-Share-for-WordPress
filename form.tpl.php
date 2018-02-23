@@ -67,9 +67,9 @@ define("ADVANCED_VIEW",false);
 							: [title], [excerpt], [permalink] <?php esc_html_e( 'and', 'wp-mastodon-share' ); ?> [tags]</p>
 					</td>
 					<td class="not_advanced_setting messageRadioButtons">
-							<label><b>title</b><br><a href="">permalink</a><br><input type="radio" name="message_template" value="[title]&#10;[permalink]"></label>
-							<label><b>title</b><br><a href="">permalink</a><br>#tags #tags<br><input type="radio" name="message_template" value="[title]&#10;[permalink]&#10;[tags]"></label>
-							<label><b>title</b><br><i>excerpt excerpt excerpt excerpt...</i><br><a href="">permalink</a><br>#tags #tags<br><input type="radio" name="message_template" value="[title]&#10;[excerpt]&#10;[permalink]&#10;[tags]"></label>
+							<label><b>title</b><br><a href="">permalink</a><br><br><br><input type="radio" name="message_template" value="[title]&#10;[permalink]"></label>
+							<label><b>title</b><br><a href="">permalink</a><br>#tags #tags<br><br><input type="radio" name="message_template" value="[title]&#10;[permalink]&#10;[tags]"></label>
+							<label><b>title</b><br><i>Here comes the excerpt...</i><br><a href="">permalink</a><br>#tags #tags<br><input type="radio" name="message_template" value="[title]&#10;[excerpt]&#10;[permalink]&#10;[tags]"></label>
 					</td>
 				</tr>
 				<tr style="display:<?php echo ACCOUNT_CONNECTED ? "block" : "none"?>">

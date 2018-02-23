@@ -4,6 +4,9 @@ jQuery(document).ready(function($) {
 	$('input:radio[name=message_template]').prop("checked",false);
 	$('input[value="'+textareaValue+'"]').prop("checked", true);	
 
+	$('input:radio').parent().css({ opacity: 0.5 });;
+	$('input:radio:checked').parent().css({ opacity: 1 });;
+	
 	$('textarea[name=message]').change(function(){
 		$('input:radio[name=message_template]').prop("checked",false);
 		$('input[value="'+this.value+'"]').prop("checked", true);	
@@ -29,5 +32,10 @@ jQuery(document).ready(function($) {
 	$('input:radio[name=message_template]').change(function(){
 			let value = $('input:radio[name=message_template]:checked').val();
 			$('textarea[name=message]').val(value);
+	});
+
+	$('input:radio').change(function(){
+			$('input:radio').parent().css({ opacity: 0.5 });;
+			$('input:radio:checked').parent().css({ opacity: 1 });;
 	});
 });
