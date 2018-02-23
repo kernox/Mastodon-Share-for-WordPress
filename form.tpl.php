@@ -76,7 +76,7 @@ define("ADVANCED_VIEW",false);
 					<th scope="row">
 						<label for="mode"><?php esc_html_e( 'Toot mode', 'wp-mastodon-share' ); ?></label>
 					</th>
-					<td>
+					<td class="sopeRadioButtons">
 							<label><input type="radio" name="mode" <?php if ( 'public' === $mode ): ?>checked<?php endif; ?> value="public"><img src="<?php echo plugins_url( 'img/post/public.svg', __FILE__ );?>" class="modeIcon"> <?php esc_html_e( 'Public', 'wp-mastodon-share' ); ?></label>
 							<label><input type="radio" name="mode" <?php if ( 'unlisted' === $mode ): ?>checked<?php endif; ?> value="unlisted"><img src="<?php echo plugins_url( 'img/post/unlisted.svg', __FILE__ );?>" class="modeIcon"> <?php esc_html_e( 'Unlisted', 'wp-mastodon-share' ); ?></label>
 							<label><input type="radio" name="mode" <?php if ( 'private' === $mode ): ?>checked<?php endif; ?> value="private"><img src="<?php echo plugins_url( 'img/post/private.svg', __FILE__ );?>" class="modeIcon"> <?php esc_html_e( 'Private', 'wp-mastodon-share' ); ?></label>
