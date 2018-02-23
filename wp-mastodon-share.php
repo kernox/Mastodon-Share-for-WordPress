@@ -153,39 +153,49 @@ class Mastoshare
 				$redirect_url = get_admin_url();
 				$auth_url = $client->register_app($redirect_url);
 
+				if(empty($instance)){
+					update_option(
+						'mastoshare-notice',
+						serialize(
+							array(
+							'message' => '<strong>Mastodon Auto Share</strong> : ' . __( 'Thank you to set your Mastodon instance before connect !', 'wp-mastodon-share' ),
+							'class' => 'error',
+							)
+						)
+					);
+				} else 	{
+					update_option('mastoshare-client-id', $client->get_client_id());
+					update_option('mastoshare-client-secret', $client->get_client_secret());
 
-				update_option('mastoshare-client-id', $client->get_client_id());
-				update_option('mastoshare-client-secret', $client->get_client_secret());
+					update_option( 'mastoshare-instance', $instance );
+					update_option( 'mastoshare-message', sanitize_textarea_field( $message ) );
+					update_option( 'mastoshare-mode', sanitize_text_field( $_POST['mode'] ) );
+					update_option( 'mastoshare-toot-size', (int) $_POST['size'] );
 
-				update_option( 'mastoshare-instance', $instance );
-				update_option( 'mastoshare-message', sanitize_textarea_field( $message ) );
-				update_option( 'mastoshare-mode', sanitize_text_field( $_POST['mode'] ) );
-				update_option( 'mastoshare-toot-size', (int) $_POST['size'] );
+					update_option( 'mastoshare-content-warning', sanitize_textarea_field( $content_warning ) );
 
-				update_option( 'mastoshare-content-warning', sanitize_textarea_field( $content_warning ) );
+					$account = $client->verify_credentials($token);
 
-				$account = $client->verify_credentials($token);
+					if( isset( $account->error ) ){
+						echo '<meta http-equiv="refresh" content="0; url=' . $auth_url . '" />';
+						echo 'Redirect to '.$instance;
+						exit;
+					}
 
-				if( isset( $account->error ) ){
-					echo '<meta http-equiv="refresh" content="0; url=' . $auth_url . '" />';
-					echo 'Redirect to '.$instance;
-					exit;
+					//Inform user that save was successfull
+					update_option(
+						'mastoshare-notice',
+						serialize(
+							array(
+							'message' => '<strong>Mastodon Auto Share</strong> : ' . __( 'Configuration successfully saved !', 'wp-mastodon-share' ),
+							'class' => 'success',
+							)
+						)
+					);
+
 				}
 
-				//Inform user that save was successfull
-				update_option(
-					'mastoshare-notice',
-					serialize(
-						array(
-						'message' => '<strong>Mastodon Auto Share</strong> : ' . __( 'Configuration successfully saved !', 'wp-mastodon-share' ),
-						'class' => 'success',
-						)
-					)
-				);
-
 				$this->admin_notices();
-
-
 			}
 		}
 
