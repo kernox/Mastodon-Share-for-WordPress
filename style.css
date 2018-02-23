@@ -13,8 +13,71 @@
 	box-shadow:none !important;
 	text-shadow:none !important;
 	font-weight:bold;
-	background-color:#FFF !important;
 }
+
+.wrap .button:hover{
+	background-color:transparent;
+}
+
+.wrap input, .wrap textarea{
+	background-color:transparent !important;
+	color:#000 !important;
+	border-color:#000;
+	border-radius:4px;
+}
+
+.wrap > form{
+	border:solid 1px #2b90d9;
+	padding:1%;
+	background-color:#FFF;
+}
+
+.spacer{
+	margin-top: 20px;
+}
+
+.account{
+	border: 1px solid #000;
+	padding: 15px;
+	border-radius:4px;
+	float:left;
+
+}
+
+.m-avatar{
+	float:left;
+	border-radius: 100px;
+	margin-right: 20px;
+	width: 60px;
+}
+
+.details{
+	float:left;
+}
+
+.details .link{
+	color:#000;
+	text-decoration: none;
+}
+
+.connected{
+	color: #2b90d9;
+	font-size: 16px;
+	font-weight:bold;
+	margin-bottom: 10px;
+}
+
+.disconnected{
+	color: #FF0000;
+	font-size: 16px;
+	text-align: center;
+	width: 100%;
+}
+
+.advanced_setting{
+	display:none;
+}
+
 
 .wrap .button:hover{
 	background-color:transparent;
@@ -72,71 +135,7 @@
 	display:none;
 }
 
-#show_advanced_configuration{
-	color:#000 !important;
-	border-color:#000 !important;
-}
 
-.wrap .button:hover{
-	background-color:transparent;
-}
-
-.wrap input, .wrap textarea{
-	background-color:transparent !important;
-	color:#000 !important;
-	border-color:#000;
-	border-radius:4px;
-}
-.spacer{
-	margin-top: 20px;
-}
-
-.account{
-	border: 1px solid #000;
-	padding: 15px;
-	border-radius:4px;
-	float:left;
-
-}
-
-.m-avatar{
-	float:left;
-	border-radius: 100px;
-	margin-right: 20px;
-	width: 60px;
-}
-
-.details{
-	float:left;
-}
-
-.details .link{
-	color:#000;
-	text-decoration: none;
-}
-
-.connected{
-	color: #2b90d9;
-	font-size: 16px;
-	font-weight:bold;
-	margin-bottom: 10px;
-}
-
-.disconnected{
-	color: #FF0000;
-	font-size: 16px;
-	text-align: center;
-	width: 100%;
-}
-
-.advanced_setting{
-	display:none;
-}
-
-#show_advanced_configuration{
-	background-color:transparent  !important;
-	text-align:center;
-}
 label{
 	display:inline-block;
 	vertical-align: bottom;
@@ -158,7 +157,6 @@ html > body .liberapay-btn{
 	margin-top: 3px;
     position: absolute;
 }
-}
 
 .github-icon{
 	margin-right: 10px;
@@ -173,4 +171,16 @@ html > body .liberapay-btn{
 html > body .liberapay-btn{
 	margin-top: 3px;
     position: absolute;
+}
+
+.tab-button{
+	text-align:center;
+	margin-bottom:-1px !important;
+	border-bottom:none !important;
+	border-radius:0 !important;
+}
+
+.tab-button.active{
+	background-color:#FFF !important;
+	margin-bottom:-0px !important;
 }

@@ -5,6 +5,11 @@ define("ADVANCED_VIEW",false);
 
 <div class="wrap">
 	<h1><?php esc_html_e( 'Mastodon Auto Share Configuration', 'wp-mastodon-share' ); ?></h1>
+	<br>
+	<?php if(ACCOUNT_CONNECTED): ?>
+			<input class="button active tab-button" value="<?php esc_attr_e( 'Simple configuration', 'wp-mastodon-share' ); ?>" id="hide_advanced_configuration">
+			<input class="button tab-button" value="<?php esc_attr_e( 'Advanced configuration', 'wp-mastodon-share' ); ?>" id="show_advanced_configuration">
+	<?php endif ?>
 	<form method="POST">
 		<?php wp_nonce_field( 'mastoshare-configuration' ); ?>
 		<table class="form-table">
@@ -91,7 +96,6 @@ define("ADVANCED_VIEW",false);
 
 		<?php if(ACCOUNT_CONNECTED): ?>
 			<input class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save configuration', 'wp-mastodon-share' ); ?>" name="save" id="save">
-			<input class="button button-primary" value="<?php esc_attr_e( 'Advanced configuration', 'wp-mastodon-share' ); ?>" id="show_advanced_configuration">
 		<?php endif ?>
 
 	</form>
