@@ -7,8 +7,8 @@ define("ADVANCED_VIEW",false);
 	<h1><?php esc_html_e( 'Mastodon Auto Share Configuration', 'wp-mastodon-share' ); ?></h1>
 	<br>
 	<?php if(ACCOUNT_CONNECTED): ?>
-			<input class="button active tab-button" value="<?php esc_attr_e( 'Simple configuration', 'wp-mastodon-share' ); ?>" id="hide_advanced_configuration">
-			<input class="button tab-button" value="<?php esc_attr_e( 'Advanced configuration', 'wp-mastodon-share' ); ?>" id="show_advanced_configuration">
+			<input type="button" class="button active tab-button" value="<?php esc_attr_e( 'Simple configuration', 'wp-mastodon-share' ); ?>" id="hide_advanced_configuration">
+			<input type="button" class="button tab-button" value="<?php esc_attr_e( 'Advanced configuration', 'wp-mastodon-share' ); ?>" id="show_advanced_configuration">
 	<?php endif ?>
 	<form method="POST">
 		<?php wp_nonce_field( 'mastoshare-configuration' ); ?>
