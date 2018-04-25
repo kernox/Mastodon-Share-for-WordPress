@@ -4,7 +4,7 @@
  * Plugin Name: Mastodon Auto Share
  * Plugin URI: https://github.com/kernox/mastoshare-wp
  * Description: Share WordPress posts on a mastodon instance.
- * Version: 1.3
+ * Version: 1.4
  * Author: Hellexis
  * Author URI: https://github.com/kernox
  * Text Domain: wp-mastodon-share
