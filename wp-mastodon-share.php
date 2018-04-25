@@ -244,33 +244,36 @@ class Mastoshare
 
 		if ( $toot_on_mastodon_option ) {
 
+		    //var_dump($post); exit;
+
 			$message = stripslashes($_POST['mastoshare_toot']);
 
 			if ( ! empty( $message ) ) {
 
-				//Save the toot, for scheduling
-				if($post->post_status == 'future') {
-					update_post_meta($id, 'mastoshare-toot', $message);
+                //Save the toot, for scheduling
+                if($post->post_status == 'future') {
+                    update_post_meta($id, 'mastoshare-toot', $message);
 
-					if ( $thumb_url ) {
+                    if ( $thumb_url ) {
 
-						$thumb_path = str_replace( get_site_url(), get_home_path(), $thumb_url );
-						update_post_meta($id, 'mastoshare-toot-thumbnail', $thumb_path);
-					}
+                        $thumb_path = str_replace( get_site_url(), get_home_path(), $thumb_url );
+                        update_post_meta($id, 'mastoshare-toot-thumbnail', $thumb_path);
+                    }
 
-					update_option(
+                    update_option(
 						'mastoshare-notice',
 						serialize(
 							array(
 								'message' => '<strong>Mastodon Auto Share</strong> : ' . __( 'Toot saved for schedule !', 'wp-mastodon-share' ),
-								'class' => 'info',
+								'class' => 'info'
 							)
 						)
 					);
-				} else if($post->post_status !== 'draft') {
-					$instance = get_option( 'mastoshare-instance' );
-					$access_token = get_option('mastoshare-token');
-					$mode = get_option( 'mastoshare-mode', 'public' );
+                } else if($post->post_status == 'publish') {
+
+                    $instance = get_option( 'mastoshare-instance' );
+                    $access_token = get_option('mastoshare-token');
+                    $mode = get_option( 'mastoshare-mode', 'public' );
 
 					$client = new Client($instance, $access_token);
 
