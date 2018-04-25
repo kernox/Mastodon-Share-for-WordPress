@@ -90,7 +90,7 @@ class Mastoshare
 	 *
 	 * @return void
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts($hook) {
 
 		global $pagenow;
 
@@ -100,6 +100,12 @@ class Mastoshare
 
 			$plugin_url = plugin_dir_url( __FILE__ );
 			wp_enqueue_script( 'toot_editor', $plugin_url . 'js/toot_editor.js', array(), $infos['Version'], true );
+		}
+		if($pagenow == "options-general.php"){
+			//We might be on settings page <-- Do you know a bette solution to get if we are in our own settings page?
+			$plugin_url = plugin_dir_url( __FILE__ );
+			wp_enqueue_script( 'settings_page', $plugin_url . 'js/settings_page.js', array('jquery'), $infos['Version'], true );
+
 		}
 	}
 
@@ -206,7 +212,7 @@ class Mastoshare
 			$account = $client->verify_credentials($token);
 		}
 
-		$message = get_option( 'mastoshare-message', "[title]\n\n[excerpt]\n\n[permalink]\n\n[tags]" );
+		$message = get_option( 'mastoshare-message', "[title]\n[excerpt]\n[permalink]\n[tags]" );
 		$mode = get_option( 'mastoshare-mode', 'public' );
 		$toot_size = get_option( 'mastoshare-toot-size', 500 );
 		$content_warning = get_option( 'mastoshare-content-warning', '');
