@@ -25,6 +25,7 @@ class Mastoshare
 		add_action( 'add_meta_boxes', array($this, 'add_metabox' ) );
 		add_action( 'tiny_mce_before_init', array($this, 'tinymce_before_init' ) );
 		add_action( 'publish_future_post', array($this, 'toot_scheduled_post') );
+
 	}
 
 	/**
@@ -95,12 +96,6 @@ class Mastoshare
 		global $pagenow;
 
 		$infos = get_plugin_data(__FILE__);
-
-		if ( in_array( $pagenow, [ 'post-new.php', 'post.php' ] ) ) {
-
-			$plugin_url = plugin_dir_url( __FILE__ );
-			wp_enqueue_script( 'toot_editor', $plugin_url . 'js/toot_editor.js', array(), $infos['Version'], true );
-		}
 		if($pagenow == "options-general.php"){
 			//We might be on settings page <-- Do you know a bette solution to get if we are in our own settings page?
 			$plugin_url = plugin_dir_url( __FILE__ );
@@ -248,6 +243,11 @@ class Mastoshare
 
 			$message = stripslashes($_POST['mastoshare_toot']);
 
+			//If message empty user want's the templated one
+			if ($message == ""){
+				$message = $this->getTootFromTemplate($id);
+			}
+
 			if ( ! empty( $message ) ) {
 
                 //Save the toot, for scheduling
@@ -393,33 +393,53 @@ class Mastoshare
 	 * @return void
 	 */
 	public function metabox( $post ) {
-
-		$id = $post->ID;
-		$toot_size = (int) get_option( 'mastoshare-toot-size', 500 );
-
-		$message = get_option( 'mastoshare-message' );
-		$cw_content = get_option('mastoshare-content-warning');
-
 		$status = get_post_meta( $post->ID, 'mastoshare-post-status', true );
 
 		$checked = ( ! $status ) ? 'checked' : '';
-
-		echo '<textarea id="mastoshare_toot" name="mastoshare_toot" maxlength="' . $toot_size . '" style="width:100%; min-height:320px; resize:none">Loading, please wait ...</textarea>'.
-		'<textarea id="mastoshare_toot_template" style="display:none">' . $message . '</textarea>' .
-		'<p>' . __( 'Chars', 'wp-mastodon-share' ) . ': <span id="toot_current_size">?</span> / <span id="toot_limit_size">?</span></p>';
-
-		echo '<div style="margin: 20px 0;"><label for="cw_content">'.__('Content Warning Text', 'wp-mastodon-share').'</label>'.
-		'<input id="cw_content" name="cw_content" style="width: 100%;" type="text" value="' . $cw_content . '">'
-		.'</div>';
 
 		echo '<div style="margin: 20px 0;"><input ' . $checked . ' type="checkbox" name="toot_on_mastodon" id="toot_on_mastodon">' .
 		'<label for="toot_on_mastodon">' . __( 'Toot on Mastodon', 'wp-mastodon-share' ) . '</label></div>';
 
 	}
 
-	public function tinymce_before_init($init_array){
-		$init_array['setup'] = file_get_contents(plugin_dir_path(__FILE__).'/js/tinymce_config.js');
-		return $init_array;
+
+	private function getTootFromTemplate($id){
+
+		$post = get_post( $id );
+		$toot_size = (int) get_option( 'mastoshare-toot-size', 500 );
+
+
+		$message_template = get_option( 'mastoshare-message', "[title]\n[excerpt]\n[permalink]\n[tags]" );
+
+				//Replace title
+				$post_title = get_the_title( $id );
+				$message_template = str_replace("[title]", $post_title, $message_template);
+
+				//Replace permalink
+				$post_permalink = get_the_permalink( $id );
+				$message_template = str_replace("[permalink]", $post_permalink, $message_template);
+
+				//Replace tags  
+				$post_tags = get_the_tags($post->ID);
+		        $post_tags_content = '';
+		        if ( $post_tags ) {
+				    foreach( $post_tags as $tag ) {
+				    	$post_tags_content =  $post_tags_content . '#'.  preg_replace('/\s+/', '',$tag->name). ' '  ; 
+				    }
+				    $post_tags_content = trim($post_tags_content);
+				}
+				$message_template = str_replace("[tags]", $post_tags_content, $message_template);
+
+				//Replace excerpt
+				$post_content_long = wp_trim_words($post->post_content);
+				$excerpt_len = $toot_size - strlen($message_template) + 9 - 5;
+
+				$post_excerpt = substr($post_content_long,0,$excerpt_len) ."[...]";
+
+				$message_template = str_replace("[excerpt]", $post_excerpt, $message_template);
+
+
+				return substr($message_template,0,$toot_size);
 	}
 
 	private function sendTestToot(){
