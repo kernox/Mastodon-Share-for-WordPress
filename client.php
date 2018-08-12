@@ -19,7 +19,6 @@ class Client
 			'website' => $this->instance_url
 		));
 
-
 		$this->app = $response;
 
 		$params = http_build_query(array(

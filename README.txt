@@ -14,6 +14,9 @@ That's all ;)
 
 == Changelog ==
 
+= 1.5 =
+New toot editor, gutemberg compatible
+
 = 1.3 =
 * Fix deprecated javascripts
 * Fix toot auto truncation
